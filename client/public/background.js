@@ -1,21 +1,21 @@
 // Background service worker for the extension
-let currentSearchData = null;
+let currentCandidateData = null;
 
-// Listen for tab updates to detect search engine visits
+// Listen for tab updates to detect recruitment platform visits
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   // Only run when the page is fully loaded
   if (changeInfo.status === 'complete' && tab.active) {
-    // Check if the URL is from a supported search engine
-    const isSearchPage = 
-      tab.url.includes('google.com/search') || 
-      tab.url.includes('bing.com/search') || 
-      tab.url.includes('duckduckgo.com');
+    // Check if the URL is from a supported recruitment platform
+    const isRecruitmentPage = 
+      tab.url.includes('linkedin.com/search/results') || 
+      tab.url.includes('indeed.com/jobs') || 
+      tab.url.includes('ziprecruiter.com/candidate/search');
     
-    if (isSearchPage) {
-      // Extract search data from the page
+    if (isRecruitmentPage) {
+      // Extract candidate data from the page
       setTimeout(() => {
         chrome.tabs.executeScript(tabId, { file: 'content-script.js' });
-      }, 1000); // Small delay to ensure page is fully rendered
+      }, 1500); // Small delay to ensure page is fully rendered
     }
   }
 });
@@ -23,12 +23,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 // Listen for messages from content script
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'searchData') {
-    // Store the search data
-    currentSearchData = message.data;
+    // Store the candidate search data
+    currentCandidateData = message.data;
     
-    // Update extension badge to indicate search data is available
+    // Update extension badge to indicate candidate data is available
     chrome.action.setBadgeText({ text: "!" });
-    chrome.action.setBadgeBackgroundColor({ color: "#6200EE" });
+    chrome.action.setBadgeBackgroundColor({ color: "#0077B5" }); // LinkedIn blue color
     
     sendResponse({ success: true });
   }
@@ -52,10 +52,10 @@ chrome.storage.sync.get(['settings'], (result) => {
         notifications: true,
         privacyMode: true,
         autoDetect: true,
-        engines: {
-          google: true,
-          bing: true,
-          duckduckgo: true
+        platforms: {
+          linkedin: true,
+          indeed: true,
+          ziprecruiter: true
         }
       }
     });

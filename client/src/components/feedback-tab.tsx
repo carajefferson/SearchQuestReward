@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { SearchData, FeedbackSubmission } from "@shared/schema";
+import { SearchData, FeedbackSubmission, CandidateData } from "@shared/schema";
 
 interface FeedbackTabProps {
   currentSearch: SearchData | null;
-  searchResults: SearchData["results"] | null;
+  searchResults: CandidateData[] | null;
   onSubmitFeedback: (feedback: FeedbackSubmission) => Promise<void>;
 }
 
@@ -32,7 +32,7 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
     if (!currentSearch) {
       toast({
         title: "Error",
-        description: "No search data available to submit feedback for.",
+        description: "No candidate search data available to submit feedback for.",
         variant: "destructive",
       });
       return;
@@ -87,10 +87,10 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
     return (
       <div className="p-4">
         <div className="bg-white rounded shadow-elevation-1 p-4 text-center">
-          <span className="material-icons text-neutral-400 text-4xl mb-2">search_off</span>
-          <h2 className="text-lg font-medium mb-1">No Search Detected</h2>
+          <span className="material-icons text-neutral-400 text-4xl mb-2">person_search</span>
+          <h2 className="text-lg font-medium mb-1">No Candidate Search Detected</h2>
           <p className="text-neutral-600 text-sm">
-            Visit a search engine like Google, Bing, or DuckDuckGo and perform a search to provide feedback.
+            Visit LinkedIn, Indeed, or ZipRecruiter and search for candidates to provide feedback.
           </p>
         </div>
       </div>
@@ -105,8 +105,8 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
         <div className="mt-1 p-3 bg-white rounded shadow-elevation-1">
           <p className="font-medium">{currentSearch.query}</p>
           <div className="mt-2 flex items-center text-neutral-500 text-sm">
-            <span className="material-icons text-sm mr-1">public</span>
-            <span>{currentSearch.engine}</span>
+            <span className="material-icons text-sm mr-1">business</span>
+            <span>{currentSearch.source}</span>
             {currentSearch.resultsCount && (
               <>
                 <span className="mx-2">•</span>
@@ -117,10 +117,10 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
         </div>
       </div>
 
-      {/* Search Results Preview */}
+      {/* Candidate Results Preview */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-neutral-500">TOP RESULTS</h2>
+          <h2 className="text-sm font-medium text-neutral-500">TOP CANDIDATES</h2>
           <button 
             className="text-primary text-sm flex items-center"
             onClick={toggleResults}
@@ -133,31 +133,121 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
         </div>
         
         <div className="mt-1 space-y-2">
-          {searchResults.slice(0, 3).map((result, index) => (
-            <div key={`result-${index}`} className="p-3 bg-white rounded shadow-elevation-1">
-              <h3 className="font-medium text-sm truncate">{result.title}</h3>
-              {result.snippet && (
-                <p className="text-sm text-neutral-600 line-clamp-2">{result.snippet}</p>
-              )}
-              <div className="mt-1 text-xs text-neutral-500 flex items-center">
-                <span className="material-icons text-xs mr-1">link</span>
-                <span className="truncate">{result.url}</span>
+          {searchResults.slice(0, 3).map((candidate, index) => (
+            <div key={`candidate-${index}`} className="p-3 bg-white rounded shadow-elevation-1">
+              <div className="flex justify-between items-start">
+                <h3 className="font-medium text-base truncate">{candidate.name}</h3>
+                {candidate.matchScore && (
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                    candidate.matchScore >= 90 ? "bg-green-100 text-green-800" : 
+                    candidate.matchScore >= 80 ? "bg-blue-100 text-blue-800" : 
+                    "bg-yellow-100 text-yellow-800"
+                  }`}>
+                    {candidate.matchScore}% Match
+                  </span>
+                )}
               </div>
+              
+              <div className="mt-1 text-sm text-neutral-600">
+                <div className="flex items-center">
+                  <span className="material-icons text-xs mr-1">work</span>
+                  <span>{candidate.currentPosition || candidate.title || "Not specified"}</span>
+                </div>
+                {candidate.currentWorkplace && (
+                  <div className="flex items-center mt-0.5">
+                    <span className="material-icons text-xs mr-1">business</span>
+                    <span>{candidate.currentWorkplace}</span>
+                  </div>
+                )}
+                {candidate.location && (
+                  <div className="flex items-center mt-0.5">
+                    <span className="material-icons text-xs mr-1">location_on</span>
+                    <span>{candidate.location}</span>
+                  </div>
+                )}
+                {candidate.education && (
+                  <div className="flex items-center mt-0.5">
+                    <span className="material-icons text-xs mr-1">school</span>
+                    <span>{candidate.education}</span>
+                  </div>
+                )}
+              </div>
+              
+              {candidate.pastPosition1 && candidate.pastWorkplace1 && (
+                <div className="mt-2 text-xs text-neutral-500">
+                  <div className="flex items-center">
+                    <span className="material-icons text-xs mr-1">history</span>
+                    <span>Previous: {candidate.pastPosition1} at {candidate.pastWorkplace1}</span>
+                  </div>
+                </div>
+              )}
+              
+              {candidate.connectionType && (
+                <div className="mt-2 flex items-center text-xs text-primary">
+                  <span className="material-icons text-xs mr-1">people</span>
+                  <span>{candidate.connectionType} • {candidate.mutualConnections || candidate.profileStatus}</span>
+                </div>
+              )}
             </div>
           ))}
           
           {isExpanded && searchResults.length > 3 && (
             <div className="space-y-2 mt-2">
-              {searchResults.slice(3).map((result, index) => (
-                <div key={`expanded-result-${index}`} className="p-3 bg-white rounded shadow-elevation-1">
-                  <h3 className="font-medium text-sm truncate">{result.title}</h3>
-                  {result.snippet && (
-                    <p className="text-sm text-neutral-600 line-clamp-2">{result.snippet}</p>
-                  )}
-                  <div className="mt-1 text-xs text-neutral-500 flex items-center">
-                    <span className="material-icons text-xs mr-1">link</span>
-                    <span className="truncate">{result.url}</span>
+              {searchResults.slice(3).map((candidate, index) => (
+                <div key={`expanded-candidate-${index}`} className="p-3 bg-white rounded shadow-elevation-1">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-medium text-base truncate">{candidate.name}</h3>
+                    {candidate.matchScore && (
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                        candidate.matchScore >= 90 ? "bg-green-100 text-green-800" : 
+                        candidate.matchScore >= 80 ? "bg-blue-100 text-blue-800" : 
+                        "bg-yellow-100 text-yellow-800"
+                      }`}>
+                        {candidate.matchScore}% Match
+                      </span>
+                    )}
                   </div>
+                  
+                  <div className="mt-1 text-sm text-neutral-600">
+                    <div className="flex items-center">
+                      <span className="material-icons text-xs mr-1">work</span>
+                      <span>{candidate.currentPosition || candidate.title || "Not specified"}</span>
+                    </div>
+                    {candidate.currentWorkplace && (
+                      <div className="flex items-center mt-0.5">
+                        <span className="material-icons text-xs mr-1">business</span>
+                        <span>{candidate.currentWorkplace}</span>
+                      </div>
+                    )}
+                    {candidate.location && (
+                      <div className="flex items-center mt-0.5">
+                        <span className="material-icons text-xs mr-1">location_on</span>
+                        <span>{candidate.location}</span>
+                      </div>
+                    )}
+                    {candidate.education && (
+                      <div className="flex items-center mt-0.5">
+                        <span className="material-icons text-xs mr-1">school</span>
+                        <span>{candidate.education}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {candidate.pastPosition1 && candidate.pastWorkplace1 && (
+                    <div className="mt-2 text-xs text-neutral-500">
+                      <div className="flex items-center">
+                        <span className="material-icons text-xs mr-1">history</span>
+                        <span>Previous: {candidate.pastPosition1} at {candidate.pastWorkplace1}</span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {candidate.connectionType && (
+                    <div className="mt-2 flex items-center text-xs text-primary">
+                      <span className="material-icons text-xs mr-1">people</span>
+                      <span>{candidate.connectionType} • {candidate.mutualConnections || candidate.profileStatus}</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -168,11 +258,11 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
       {/* Feedback Form */}
       <div className="bg-white rounded shadow-elevation-1 mb-4 overflow-hidden">
         <div className="p-4">
-          <h2 className="font-medium mb-3">Rate these search results</h2>
+          <h2 className="font-medium mb-3">Rate these candidate results</h2>
           
           {/* Relevance Rating */}
           <div className="mb-4">
-            <label className="block text-sm text-neutral-600 mb-1">Relevance to your query</label>
+            <label className="block text-sm text-neutral-600 mb-1">Relevance to your search criteria</label>
             <div className="flex space-x-1">
               {[1, 2, 3, 4, 5].map((rating) => (
                 <button
@@ -196,7 +286,7 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
           
           {/* Quality Rating */}
           <div className="mb-4">
-            <label className="block text-sm text-neutral-600 mb-1">Quality of results</label>
+            <label className="block text-sm text-neutral-600 mb-1">Quality of candidates</label>
             <div className="flex space-x-1">
               {[1, 2, 3, 4, 5].map((rating) => (
                 <button
@@ -227,7 +317,7 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
               id="feedback-comment"
               rows={3}
               className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="What could be improved?"
+              placeholder="What could be improved about these candidate matches?"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />

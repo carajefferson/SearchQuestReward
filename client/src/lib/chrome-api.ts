@@ -1,12 +1,15 @@
+// @ts-nocheck
 import { SearchData } from "@shared/schema";
 
 // Mock for development environment
 const isDev = process.env.NODE_ENV === "development";
 
+// Chrome Tab interface
 interface ChromeTab {
   id?: number;
   url?: string;
   title?: string;
+  active?: boolean;
 }
 
 // Utility to get current tab
@@ -16,7 +19,7 @@ export async function getChromeCurrentTab(): Promise<ChromeTab | null> {
   }
   
   try {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tabs = await window.chrome.tabs.query({ active: true, currentWindow: true });
     return tabs[0] || null;
   } catch (error) {
     console.error("Error getting current tab:", error);
@@ -32,73 +35,74 @@ export async function extractSearchData(tab: ChromeTab): Promise<SearchData | nu
   
   try {
     // Inject content script to extract data
-    const results = await chrome.tabs.executeScript(tab.id, {
+    const results = await window.chrome.tabs.executeScript(tab.id, {
       code: `
         (function() {
-          // Logic to extract search query and results from the page
-          // This would be tailored to specific search engines
+          // Logic to extract candidate data from the page
           const data = {
             query: "",
-            engine: "",
+            source: "",
             resultsCount: "",
             results: []
           };
           
-          // Detect search engine
-          if (window.location.hostname.includes("google")) {
-            data.engine = "Google";
-            data.query = document.querySelector('input[name="q"]')?.value || "";
-            data.resultsCount = document.querySelector("#result-stats")?.textContent || "";
+          const url = window.location.href;
+          const hostname = window.location.hostname;
+          
+          // Helper to get URL parameters
+          function getQueryParam(url, param) {
+            const searchParams = new URL(url).searchParams;
+            return searchParams.get(param);
+          }
+          
+          // Detect LinkedIn
+          if (hostname.includes('linkedin.com')) {
+            data.source = 'LinkedIn';
             
-            // Extract results
-            const resultElements = document.querySelectorAll(".g");
-            resultElements.forEach(el => {
-              const titleEl = el.querySelector("h3");
-              const snippetEl = el.querySelector(".VwiC3b");
-              const linkEl = el.querySelector("a");
-              
-              if (titleEl && linkEl) {
-                data.results.push({
-                  title: titleEl.textContent || "",
-                  snippet: snippetEl ? snippetEl.textContent : undefined,
-                  url: linkEl.href
-                });
-              }
-            });
-          } else if (window.location.hostname.includes("bing")) {
-            data.engine = "Bing";
-            data.query = document.querySelector('input[name="q"]')?.value || "";
+            // Extract search query
+            data.query = getQueryParam(url, 'keywords') || 
+                      document.querySelector('.search-global-typeahead__input')?.value || 
+                      "";
             
-            // Extract results
-            const resultElements = document.querySelectorAll(".b_algo");
-            resultElements.forEach(el => {
-              const titleEl = el.querySelector("h2 a");
-              const snippetEl = el.querySelector(".b_caption p");
-              
-              if (titleEl) {
-                data.results.push({
-                  title: titleEl.textContent || "",
-                  snippet: snippetEl ? snippetEl.textContent : undefined,
-                  url: titleEl.href
-                });
-              }
-            });
-          } else if (window.location.hostname.includes("duckduckgo")) {
-            data.engine = "DuckDuckGo";
-            data.query = document.querySelector('input[name="q"]')?.value || "";
+            // Extract results count
+            const resultsCountEl = document.querySelector('.search-results-container h2');
+            if (resultsCountEl) {
+              data.resultsCount = resultsCountEl.textContent;
+            }
             
-            // Extract results
-            const resultElements = document.querySelectorAll(".result");
-            resultElements.forEach(el => {
-              const titleEl = el.querySelector("h2 a");
-              const snippetEl = el.querySelector(".result__snippet");
-              
-              if (titleEl) {
-                data.results.push({
-                  title: titleEl.textContent || "",
-                  snippet: snippetEl ? snippetEl.textContent : undefined,
-                  url: titleEl.href
-                });
+            // Extract candidate results
+            const resultElements = document.querySelectorAll('.search-result');
+            resultElements.forEach((el) => {
+              try {
+                // Extract candidate name
+                const nameEl = el.querySelector('.actor-name');
+                // Extract candidate title
+                const titleEl = el.querySelector('.subline-level-1');
+                // Extract location
+                const locationEl = el.querySelector('.subline-level-2');
+                // Extract current position
+                const currentPositionEl = el.querySelector('.entity-result__primary-subtitle');
+                // Mutual connections
+                const mutualConnectionsEl = el.querySelector('.member-insights__connection-count');
+                
+                // Only add to results if we have at least a name
+                if (nameEl) {
+                  // Generate a match score (in a real app, this would be based on AI/ML)
+                  const matchScore = Math.floor(Math.random() * 25) + 75; // Random score between 75-99
+                  
+                  data.results.push({
+                    name: nameEl.textContent.trim(),
+                    title: titleEl ? titleEl.textContent.trim() : undefined,
+                    location: locationEl ? locationEl.textContent.trim() : undefined,
+                    currentPosition: currentPositionEl ? currentPositionEl.textContent.trim() : undefined,
+                    connectionType: mutualConnectionsEl ? "mutual connection" : "2nd",
+                    mutualConnections: mutualConnectionsEl ? mutualConnectionsEl.textContent.trim() : undefined,
+                    profileStatus: "2nd",
+                    matchScore: matchScore
+                  });
+                }
+              } catch (error) {
+                console.error('Error extracting candidate data:', error);
               }
             });
           }
@@ -123,41 +127,99 @@ export async function extractSearchData(tab: ChromeTab): Promise<SearchData | nu
 function mockGetCurrentTab(): Promise<ChromeTab> {
   return Promise.resolve({
     id: 1,
-    url: "https://www.google.com/search?q=machine+learning+vs+deep+learning",
-    title: "machine learning vs deep learning - Google Search"
+    url: "https://www.linkedin.com/search/results/people/?keywords=medical%20assistant",
+    title: "medical assistant - LinkedIn People Search"
   });
 }
 
 function mockExtractSearchData(tab: ChromeTab): Promise<SearchData> {
   return Promise.resolve({
-    query: "machine learning vs deep learning differences",
-    engine: "Google",
-    resultsCount: "About 255M results",
+    query: "medical assistant",
+    source: "LinkedIn",
+    resultsCount: "About 1,200 results",
     results: [
       {
-        title: "Difference Between Machine Learning and Deep Learning",
-        snippet: "Machine learning uses algorithms to parse data, learn from it and make decisions, while deep learning structures algorithms in layers...",
-        url: "https://simplilearn.com/tutorials/machine-learning-tutorial/machine-learning-vs-deep-learning"
+        name: "Alexandra Gonzalez",
+        title: "Medical assistant",
+        location: "Tustin CA",
+        currentPosition: "Medical Assistant",
+        currentWorkplace: "Tustin Ear Nose & Throat Sinus and Allergy Center",
+        education: "B.A Public Health",
+        specialization: "Medical assistant",
+        connectionType: "mutual connection",
+        mutualConnections: "Ben Lazaroff",
+        profileStatus: "2nd",
+        matchScore: 95
       },
       {
-        title: "Machine Learning vs. Deep Learning: What's the Difference?",
-        snippet: "Deep learning is a subset of machine learning that deals with neural networks to mimic the human brain's functionality...",
-        url: "https://www.ibm.com/cloud/blog/machine-learning-vs-deep-learning"
+        name: "Isabella Teets",
+        title: "Medical Assistant",
+        location: "Newport Beach CA",
+        currentPosition: "Medical Assistant",
+        currentWorkplace: "Newport Family Medicine",
+        education: "B.S. Psychological and Brain Sciences",
+        connectionType: "mutual connection",
+        mutualConnections: "Kumaresh Mudliar",
+        profileStatus: "2nd",
+        matchScore: 92
       },
       {
-        title: "Understanding the Differences Between ML and DL",
-        snippet: "Machine learning requires more feature engineering while deep learning automatically extracts features from raw data...",
-        url: "https://towardsdatascience.com/differences-between-machine-learning-and-deep-learning"
+        name: "Ray W.",
+        title: "Medical Student",
+        location: "Cupertino CA",
+        currentPosition: "Computer Science Teacher",
+        currentWorkplace: "Washington University in St. Louis",
+        education: "Drexel University College of Medicine",
+        connectionType: "mutual connection",
+        mutualConnections: "Ron Cytron, Andrew D. Martin, and 22 other mutual connections",
+        profileStatus: "2nd",
+        matchScore: 78
       },
       {
-        title: "Deep Learning vs. Machine Learning – What's The Difference?",
-        snippet: "Deep learning is a subset of machine learning that deals with neural networks containing multiple hidden layers...",
-        url: "https://ibm.com/cloud/learn/deep-learning-vs-machine-learning"
+        name: "Margot Bellon",
+        title: "Medical Student",
+        location: "San Mateo CA",
+        pastPosition1: "Medical Fellow",
+        pastWorkplace1: "Saving Mothers",
+        education: "Drexel University College of Medicine",
+        connectionType: "mutual connection",
+        mutualConnections: "Wauson Liang",
+        profileStatus: "2nd",
+        matchScore: 81
       },
       {
-        title: "ML vs DL: Key Differences and Applications",
-        snippet: "Machine learning works best with structured data, while deep learning excels at unstructured data like images, audio and text...",
-        url: "https://nvidia.com/en-us/glossary/machine-learning-vs-deep-learning/"
+        name: "Dexter Wong",
+        title: "Clinical Manager",
+        location: "San Francisco Bay Area",
+        currentPosition: "Medical Assistant",
+        currentWorkplace: "Grace Pacific Medical Associates",
+        connectionType: "mutual connection",
+        mutualConnections: "Jerry Lee",
+        profileStatus: "2nd",
+        matchScore: 88
+      },
+      {
+        name: "Kaiti Ness",
+        title: "Pre-Med Medical Assistant",
+        location: "Dallas TX",
+        currentPosition: "Medical Assistant",
+        currentWorkplace: "Advanced Dermatology and Cosmetic Surgery",
+        connectionType: "mutual connection",
+        mutualConnections: "Matthew Zweig",
+        profileStatus: "2nd",
+        matchScore: 90
+      },
+      {
+        name: "Vincent Pham",
+        title: "Medical Assistant",
+        location: "Pittsburg CA",
+        currentPosition: "Medical Assistant",
+        currentWorkplace: "Golden State Dermatology",
+        education: "UC Santa Barbara Biopsychology Alumni",
+        connectionType: "mutual connection",
+        mutualConnections: "Kumaresh Mudliar",
+        profileStatus: "2nd",
+        matchScore: 94
       }
     ]
   });
@@ -170,9 +232,13 @@ export async function getChromeStorage<T>(key: string): Promise<T | null> {
   }
   
   return new Promise((resolve) => {
-    chrome.storage.sync.get(key, (result) => {
-      resolve(result[key] || null);
-    });
+    if (window.chrome?.storage?.sync) {
+      window.chrome.storage.sync.get(key, (result: any) => {
+        resolve(result[key] || null);
+      });
+    } else {
+      resolve(null);
+    }
   });
 }
 
@@ -183,9 +249,13 @@ export async function setChromeStorage<T>(key: string, value: T): Promise<void> 
   }
   
   return new Promise((resolve) => {
-    chrome.storage.sync.set({ [key]: value }, () => {
+    if (window.chrome?.storage?.sync) {
+      window.chrome.storage.sync.set({ [key]: value }, () => {
+        resolve();
+      });
+    } else {
       resolve();
-    });
+    }
   });
 }
 

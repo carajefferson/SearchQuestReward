@@ -15,12 +15,36 @@ export const insertUserSchema = createInsertSchema(users).pick({
   password: true,
 });
 
+// Candidate schema
+export const candidates = pgTable("candidates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  title: text("title"),
+  location: text("location"),
+  currentPosition: text("current_position"),
+  currentWorkplace: text("current_workplace"),
+  pastPosition1: text("past_position_1"),
+  pastWorkplace1: text("past_workplace_1"),
+  pastPosition2: text("past_position_2"),
+  pastWorkplace2: text("past_workplace_2"),
+  education: text("education"),
+  specialization: text("specialization"),
+  connectionType: text("connection_type"),
+  mutualConnections: text("mutual_connections"),
+  profileStatus: text("profile_status"),
+  profileUrl: text("profile_url"),
+});
+
+export const insertCandidateSchema = createInsertSchema(candidates).omit({
+  id: true,
+});
+
 // Search schema
 export const searches = pgTable("searches", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   query: text("query").notNull(),
-  engine: text("engine").notNull(),
+  source: text("source").notNull().default("RecruiterPro"),
   resultsCount: text("results_count"),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
@@ -28,24 +52,24 @@ export const searches = pgTable("searches", {
 export const insertSearchSchema = createInsertSchema(searches).pick({
   userId: true,
   query: true,
-  engine: true,
+  source: true,
   resultsCount: true,
 });
 
-// Search Result schema
+// Search Result schema (for candidate search results)
 export const searchResults = pgTable("search_results", {
   id: serial("id").primaryKey(),
   searchId: integer("search_id").notNull(),
-  title: text("title").notNull(),
-  snippet: text("snippet"),
-  url: text("url").notNull(),
+  candidateId: integer("candidate_id").notNull(),
+  matchScore: integer("match_score").notNull().default(0),
+  highlighted: boolean("highlighted").notNull().default(false),
 });
 
 export const insertSearchResultSchema = createInsertSchema(searchResults).pick({
   searchId: true,
-  title: true,
-  snippet: true,
-  url: true,
+  candidateId: true,
+  matchScore: true,
+  highlighted: true,
 });
 
 // Feedback schema
@@ -89,9 +113,9 @@ export const settings = pgTable("settings", {
   notifications: boolean("notifications").notNull().default(true),
   privacyMode: boolean("privacy_mode").notNull().default(true),
   autoDetect: boolean("auto_detect").notNull().default(true),
-  googleEnabled: boolean("google_enabled").notNull().default(true),
-  bingEnabled: boolean("bing_enabled").notNull().default(true),
-  duckDuckGoEnabled: boolean("duckduckgo_enabled").notNull().default(true),
+  linkedInEnabled: boolean("linkedin_enabled").notNull().default(true),
+  indeedEnabled: boolean("indeed_enabled").notNull().default(true),
+  zipRecruiterEnabled: boolean("ziprecruiter_enabled").notNull().default(true),
 });
 
 export const insertSettingsSchema = createInsertSchema(settings).pick({
@@ -99,9 +123,9 @@ export const insertSettingsSchema = createInsertSchema(settings).pick({
   notifications: true,
   privacyMode: true,
   autoDetect: true,
-  googleEnabled: true,
-  bingEnabled: true,
-  duckDuckGoEnabled: true,
+  linkedInEnabled: true,
+  indeedEnabled: true,
+  zipRecruiterEnabled: true,
 });
 
 // Zod schemas for API validation
@@ -112,22 +136,37 @@ export const feedbackSubmissionSchema = z.object({
   comment: z.string().optional(),
 });
 
+// Candidate search data schema
+export const candidateDataSchema = z.object({
+  name: z.string(),
+  title: z.string().optional(),
+  location: z.string().optional(),
+  currentPosition: z.string().optional(),
+  currentWorkplace: z.string().optional(),
+  pastPosition1: z.string().optional(),
+  pastWorkplace1: z.string().optional(),
+  education: z.string().optional(),
+  specialization: z.string().optional(),
+  connectionType: z.string().optional(),
+  mutualConnections: z.string().optional(),
+  profileStatus: z.string().optional(),
+  profileUrl: z.string().optional(),
+  matchScore: z.number().optional(),
+});
+
 export const searchDataSchema = z.object({
   query: z.string(),
-  engine: z.string(),
+  source: z.string(),
   resultsCount: z.string().optional(),
-  results: z.array(
-    z.object({
-      title: z.string(),
-      snippet: z.string().optional(),
-      url: z.string(),
-    })
-  ),
+  results: z.array(candidateDataSchema),
 });
 
 // Type definitions
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+
+export type Candidate = typeof candidates.$inferSelect;
+export type InsertCandidate = z.infer<typeof insertCandidateSchema>;
 
 export type Search = typeof searches.$inferSelect;
 export type InsertSearch = z.infer<typeof insertSearchSchema>;
@@ -146,3 +185,4 @@ export type InsertSettings = z.infer<typeof insertSettingsSchema>;
 
 export type FeedbackSubmission = z.infer<typeof feedbackSubmissionSchema>;
 export type SearchData = z.infer<typeof searchDataSchema>;
+export type CandidateData = z.infer<typeof candidateDataSchema>;

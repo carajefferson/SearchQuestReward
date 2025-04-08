@@ -1,17 +1,17 @@
 {
   "manifest_version": 3,
-  "name": "SearchPro Feedback",
+  "name": "RecruiterPro Feedback",
   "version": "1.0.0",
-  "description": "Provide feedback on search results and earn coins in your wallet",
+  "description": "Provide feedback on candidate search results and earn coins in your wallet",
   "permissions": [
     "activeTab",
     "storage",
     "tabs"
   ],
   "host_permissions": [
-    "*://*.google.com/*",
-    "*://*.bing.com/*",
-    "*://*.duckduckgo.com/*"
+    "*://*.linkedin.com/*",
+    "*://*.indeed.com/*",
+    "*://*.ziprecruiter.com/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -32,9 +32,9 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*.google.com/search*",
-        "*://*.bing.com/search*",
-        "*://*.duckduckgo.com/*"
+        "*://*.linkedin.com/search/results*",
+        "*://*.indeed.com/jobs*",
+        "*://*.ziprecruiter.com/candidate/search*"
       ],
       "js": ["content-script.js"]
     }

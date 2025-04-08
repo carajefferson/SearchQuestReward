@@ -85,7 +85,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium">Privacy mode</h3>
-                <p className="text-sm text-neutral-500">Only capture essential search data</p>
+                <p className="text-sm text-neutral-500">Only capture essential candidate data</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input 
@@ -100,8 +100,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Auto-detect search engines</h3>
-                <p className="text-sm text-neutral-500">Automatically identify supported search engines</p>
+                <h3 className="font-medium">Auto-detect recruitment platforms</h3>
+                <p className="text-sm text-neutral-500">Automatically identify supported platforms</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input 
@@ -115,37 +115,76 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
             
             <div>
-              <h3 className="font-medium mb-2">Supported search engines</h3>
+              <h3 className="font-medium mb-2">Supported recruitment platforms</h3>
               <div className="space-y-2">
                 <div className="flex items-center">
                   <input 
-                    id="google-engine" 
+                    id="linkedin-platform" 
                     type="checkbox" 
                     className="w-4 h-4 text-primary focus:ring-primary border-neutral-300 rounded"
-                    checked={localSettings.googleEnabled}
-                    onChange={(e) => handleToggle("googleEnabled", e.target.checked)}
+                    checked={localSettings.linkedInEnabled}
+                    onChange={(e) => handleToggle("linkedInEnabled", e.target.checked)}
                   />
-                  <label htmlFor="google-engine" className="ml-2 text-sm text-neutral-700">Google</label>
+                  <label htmlFor="linkedin-platform" className="ml-2 text-sm text-neutral-700">LinkedIn</label>
                 </div>
                 <div className="flex items-center">
                   <input 
-                    id="bing-engine" 
+                    id="indeed-platform" 
                     type="checkbox" 
                     className="w-4 h-4 text-primary focus:ring-primary border-neutral-300 rounded"
-                    checked={localSettings.bingEnabled}
-                    onChange={(e) => handleToggle("bingEnabled", e.target.checked)}
+                    checked={localSettings.indeedEnabled}
+                    onChange={(e) => handleToggle("indeedEnabled", e.target.checked)}
                   />
-                  <label htmlFor="bing-engine" className="ml-2 text-sm text-neutral-700">Bing</label>
+                  <label htmlFor="indeed-platform" className="ml-2 text-sm text-neutral-700">Indeed</label>
                 </div>
                 <div className="flex items-center">
                   <input 
-                    id="duckduckgo-engine" 
+                    id="ziprecruiter-platform" 
                     type="checkbox" 
                     className="w-4 h-4 text-primary focus:ring-primary border-neutral-300 rounded"
-                    checked={localSettings.duckDuckGoEnabled}
-                    onChange={(e) => handleToggle("duckDuckGoEnabled", e.target.checked)}
+                    checked={localSettings.zipRecruiterEnabled}
+                    onChange={(e) => handleToggle("zipRecruiterEnabled", e.target.checked)}
                   />
-                  <label htmlFor="duckduckgo-engine" className="ml-2 text-sm text-neutral-700">DuckDuckGo</label>
+                  <label htmlFor="ziprecruiter-platform" className="ml-2 text-sm text-neutral-700">ZipRecruiter</label>
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="font-medium mb-2">Candidate feedback preferences</h3>
+              <div className="p-3 bg-neutral-100 rounded">
+                <p className="text-sm text-neutral-600 mb-2">Help us improve candidate matching by collecting:</p>
+                <div className="space-y-2">
+                  <div className="flex items-center">
+                    <input 
+                      id="collect-skills" 
+                      type="checkbox" 
+                      className="w-4 h-4 text-primary focus:ring-primary border-neutral-300 rounded"
+                      checked={true}
+                      readOnly
+                    />
+                    <label htmlFor="collect-skills" className="ml-2 text-sm text-neutral-700">Skills relevance</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input 
+                      id="collect-experience" 
+                      type="checkbox" 
+                      className="w-4 h-4 text-primary focus:ring-primary border-neutral-300 rounded"
+                      checked={true}
+                      readOnly
+                    />
+                    <label htmlFor="collect-experience" className="ml-2 text-sm text-neutral-700">Experience level match</label>
+                  </div>
+                  <div className="flex items-center">
+                    <input 
+                      id="collect-location" 
+                      type="checkbox" 
+                      className="w-4 h-4 text-primary focus:ring-primary border-neutral-300 rounded"
+                      checked={true}
+                      readOnly
+                    />
+                    <label htmlFor="collect-location" className="ml-2 text-sm text-neutral-700">Location preferences</label>
+                  </div>
                 </div>
               </div>
             </div>
