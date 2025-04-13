@@ -21,7 +21,7 @@ interface FeedbackResponse {
 export function useSearchData() {
   // Create default mock search data for development
   const defaultSearch: SearchData = {
-    query: "medical assistant",
+    query: "", // Empty query by default
     source: "LinkedIn",
     resultsCount: "About 1,200 results",
     results: [

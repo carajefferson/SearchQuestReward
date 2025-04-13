@@ -194,7 +194,17 @@ function mockExtractSearchData(tab: ChromeTab, customQuery?: string): Promise<Se
       connectionType: "mutual connection",
       mutualConnections: "Ron Cytron, Andrew D. Martin, and 22 other mutual connections",
       profileStatus: "2nd",
-      matchScore: 78
+      matchScore: 78,
+      profileElements: [
+        { id: "rw1", type: "title", value: "Medical Student", highlighted: false, highlightType: "neutral" },
+        { id: "rw2", type: "location", value: "Cupertino CA", highlighted: false, highlightType: "neutral" },
+        { id: "rw3", type: "currentPosition", value: "Computer Science Teacher", highlighted: false, highlightType: "neutral" },
+        { id: "rw4", type: "currentWorkplace", value: "Washington University in St. Louis", highlighted: false, highlightType: "neutral" },
+        { id: "rw5", type: "education", value: "Drexel University College of Medicine", highlighted: false, highlightType: "neutral" },
+        { id: "rw6", type: "specialization", value: "Medical Education & Technology", highlighted: false, highlightType: "neutral" },
+        { id: "rw7", type: "skills", value: "Teaching, Computer Science, Medical Education", highlighted: false, highlightType: "neutral" },
+        { id: "rw8", type: "experience", value: "Teaching Computer Science at University Level", highlighted: false, highlightType: "neutral" }
+      ]
     },
     {
       name: "Margot Bellon",
@@ -207,7 +217,17 @@ function mockExtractSearchData(tab: ChromeTab, customQuery?: string): Promise<Se
       connectionType: "mutual connection",
       mutualConnections: "Wauson Liang",
       profileStatus: "2nd",
-      matchScore: 81
+      matchScore: 81,
+      profileElements: [
+        { id: "mb1", type: "title", value: "Medical Student", highlighted: false, highlightType: "neutral" },
+        { id: "mb2", type: "location", value: "San Mateo CA", highlighted: false, highlightType: "neutral" },
+        { id: "mb3", type: "pastPosition", value: "Medical Fellow", highlighted: false, highlightType: "neutral" },
+        { id: "mb4", type: "pastWorkplace", value: "Saving Mothers", highlighted: false, highlightType: "neutral" },
+        { id: "mb5", type: "education", value: "Drexel University College of Medicine", highlighted: false, highlightType: "neutral" },
+        { id: "mb6", type: "specialization", value: "Women's Health & Global Medicine", highlighted: false, highlightType: "neutral" },
+        { id: "mb7", type: "skills", value: "Women's health, Global medicine, Research", highlighted: false, highlightType: "neutral" },
+        { id: "mb8", type: "experience", value: "Medical fellowship in global health", highlighted: false, highlightType: "neutral" }
+      ]
     },
     {
       name: "Dexter Wong",
@@ -219,7 +239,17 @@ function mockExtractSearchData(tab: ChromeTab, customQuery?: string): Promise<Se
       connectionType: "mutual connection",
       mutualConnections: "Jerry Lee",
       profileStatus: "2nd",
-      matchScore: 88
+      matchScore: 88,
+      profileElements: [
+        { id: "dw1", type: "title", value: "Clinical Manager", highlighted: false, highlightType: "neutral" },
+        { id: "dw2", type: "location", value: "San Francisco Bay Area", highlighted: false, highlightType: "neutral" },
+        { id: "dw3", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "dw4", type: "currentWorkplace", value: "Grace Pacific Medical Associates", highlighted: false, highlightType: "neutral" },
+        { id: "dw5", type: "education", value: "B.S. Health Administration", highlighted: false, highlightType: "neutral" },
+        { id: "dw6", type: "specialization", value: "Primary Care & Clinical Management", highlighted: false, highlightType: "neutral" },
+        { id: "dw7", type: "skills", value: "Team management, Primary care, Clinic operations", highlighted: false, highlightType: "neutral" },
+        { id: "dw8", type: "experience", value: "5+ years in medical office management", highlighted: false, highlightType: "neutral" }
+      ]
     },
     {
       name: "Kaiti Ness",
@@ -231,7 +261,17 @@ function mockExtractSearchData(tab: ChromeTab, customQuery?: string): Promise<Se
       connectionType: "mutual connection",
       mutualConnections: "Matthew Zweig",
       profileStatus: "2nd",
-      matchScore: 90
+      matchScore: 90,
+      profileElements: [
+        { id: "kn1", type: "title", value: "Pre-Med Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "kn2", type: "location", value: "Dallas TX", highlighted: false, highlightType: "neutral" },
+        { id: "kn3", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "kn4", type: "currentWorkplace", value: "Advanced Dermatology and Cosmetic Surgery", highlighted: false, highlightType: "neutral" },
+        { id: "kn5", type: "education", value: "Pre-Medical Studies", highlighted: false, highlightType: "neutral" },
+        { id: "kn6", type: "specialization", value: "Dermatology & Cosmetic Procedures", highlighted: false, highlightType: "neutral" },
+        { id: "kn7", type: "skills", value: "Dermatology treatments, Patient care, Cosmetic procedures", highlighted: false, highlightType: "neutral" },
+        { id: "kn8", type: "experience", value: "3 years in dermatology practice", highlighted: false, highlightType: "neutral" }
+      ]
     },
     {
       name: "Vincent Pham",
@@ -244,7 +284,17 @@ function mockExtractSearchData(tab: ChromeTab, customQuery?: string): Promise<Se
       connectionType: "mutual connection",
       mutualConnections: "Kumaresh Mudliar",
       profileStatus: "2nd",
-      matchScore: 94
+      matchScore: 94,
+      profileElements: [
+        { id: "vp1", type: "title", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "vp2", type: "location", value: "Pittsburg CA", highlighted: false, highlightType: "neutral" },
+        { id: "vp3", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "vp4", type: "currentWorkplace", value: "Golden State Dermatology", highlighted: false, highlightType: "neutral" },
+        { id: "vp5", type: "education", value: "UC Santa Barbara Biopsychology Alumni", highlighted: false, highlightType: "neutral" },
+        { id: "vp6", type: "specialization", value: "Dermatology & Skin Care", highlighted: false, highlightType: "neutral" },
+        { id: "vp7", type: "skills", value: "Patient care, Dermatology procedures, Medical records", highlighted: false, highlightType: "neutral" },
+        { id: "vp8", type: "experience", value: "2+ years in dermatology practice", highlighted: false, highlightType: "neutral" }
+      ]
     },
     {
       name: "Sarah Johnson",
@@ -257,7 +307,17 @@ function mockExtractSearchData(tab: ChromeTab, customQuery?: string): Promise<Se
       connectionType: "mutual connection",
       mutualConnections: "Melissa Chen",
       profileStatus: "2nd",
-      matchScore: 93
+      matchScore: 93,
+      profileElements: [
+        { id: "sj1", type: "title", value: "Pediatric Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "sj2", type: "location", value: "San Diego CA", highlighted: false, highlightType: "neutral" },
+        { id: "sj3", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "sj4", type: "currentWorkplace", value: "Children's Primary Care Medical Group", highlighted: false, highlightType: "neutral" },
+        { id: "sj5", type: "education", value: "B.S. Child Development", highlighted: false, highlightType: "neutral" },
+        { id: "sj6", type: "specialization", value: "Pediatric Care", highlighted: false, highlightType: "neutral" },
+        { id: "sj7", type: "skills", value: "Pediatric assessment, Parent education, Developmental screening", highlighted: false, highlightType: "neutral" },
+        { id: "sj8", type: "experience", value: "4 years in pediatric care", highlighted: false, highlightType: "neutral" }
+      ]
     },
     {
       name: "Michael Rodriguez",
@@ -270,7 +330,17 @@ function mockExtractSearchData(tab: ChromeTab, customQuery?: string): Promise<Se
       connectionType: "mutual connection",
       mutualConnections: "David Park",
       profileStatus: "2nd",
-      matchScore: 91
+      matchScore: 91,
+      profileElements: [
+        { id: "mr1", type: "title", value: "Cardiology Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "mr2", type: "location", value: "Los Angeles CA", highlighted: false, highlightType: "neutral" },
+        { id: "mr3", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "mr4", type: "currentWorkplace", value: "Cedars-Sinai Heart Institute", highlighted: false, highlightType: "neutral" },
+        { id: "mr5", type: "education", value: "Associate's Degree in Medical Assisting", highlighted: false, highlightType: "neutral" },
+        { id: "mr6", type: "specialization", value: "Cardiology & EKG Monitoring", highlighted: false, highlightType: "neutral" },
+        { id: "mr7", type: "skills", value: "EKG administration, Cardiac monitoring, Patient vitals", highlighted: false, highlightType: "neutral" },
+        { id: "mr8", type: "experience", value: "3 years in cardiology department", highlighted: false, highlightType: "neutral" }
+      ]
     }
   ];
   
