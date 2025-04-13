@@ -5,6 +5,11 @@ import { useToast } from "@/hooks/use-toast";
 import { SearchData, FeedbackSubmission } from "@shared/schema";
 import { getChromeCurrentTab, extractSearchData } from "@/lib/chrome-api";
 
+interface FeedbackResponse {
+  coinsAwarded?: number;
+  [key: string]: any;
+}
+
 export function useSearchData() {
   const [currentSearch, setCurrentSearch] = useState<SearchData | null>(null);
   const [searchResults, setSearchResults] = useState<SearchData["results"] | null>(null);
@@ -70,14 +75,14 @@ export function useSearchData() {
   });
 
   // Submit feedback handler
-  const submitFeedback = async (feedback: FeedbackSubmission) => {
+  const submitFeedback = async (feedback: FeedbackSubmission): Promise<FeedbackResponse> => {
     if (!searchId) {
       toast({
         title: "Error",
         description: "No search data available to submit feedback for.",
         variant: "destructive",
       });
-      return;
+      return { coinsAwarded: 0 }; // Return empty response
     }
 
     const feedbackWithSearchId = {
@@ -85,7 +90,7 @@ export function useSearchData() {
       searchId,
     };
 
-    await submitFeedbackMutation(feedbackWithSearchId);
+    return await submitFeedbackMutation(feedbackWithSearchId);
   };
 
   return {

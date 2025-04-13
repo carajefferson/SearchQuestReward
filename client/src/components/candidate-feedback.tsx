@@ -2,10 +2,15 @@ import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { CandidateData, FeedbackSubmission, ProfileElement } from "@shared/schema";
 
+interface FeedbackResponse {
+  coinsAwarded?: number;
+  [key: string]: any;
+}
+
 interface CandidateFeedbackProps {
   candidate: CandidateData;
   searchId: number;
-  onSubmitFeedback: (feedback: FeedbackSubmission) => Promise<void>;
+  onSubmitFeedback: (feedback: FeedbackSubmission) => Promise<FeedbackResponse>;
   onClose: () => void;
 }
 

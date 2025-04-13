@@ -3,10 +3,15 @@ import { useToast } from "@/hooks/use-toast";
 import { SearchData, FeedbackSubmission, CandidateData } from "@shared/schema";
 import CandidateFeedback from "./candidate-feedback";
 
+interface FeedbackResponse {
+  coinsAwarded?: number;
+  [key: string]: any;
+}
+
 interface FeedbackTabProps {
   currentSearch: SearchData | null;
   searchResults: CandidateData[] | null;
-  onSubmitFeedback: (feedback: FeedbackSubmission) => Promise<void>;
+  onSubmitFeedback: (feedback: FeedbackSubmission) => Promise<FeedbackResponse>;
 }
 
 const FeedbackTab: React.FC<FeedbackTabProps> = ({ 
