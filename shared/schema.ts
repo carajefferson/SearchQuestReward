@@ -149,7 +149,6 @@ export const feedbackSubmissionSchema = z.object({
 export const profileElementSchema = z.object({
   id: z.string(),  // Unique ID for the element
   type: z.enum([
-    "name",
     "title",
     "location",
     "currentPosition",

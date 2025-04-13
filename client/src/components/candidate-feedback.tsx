@@ -55,6 +55,31 @@ const CandidateFeedback: React.FC<CandidateFeedbackProps> = ({
       })
     );
   };
+  
+  // Generate a summary of highlighted elements
+  const getHighlightSummary = () => {
+    const goodCount = profileElements.filter(el => el.highlighted && el.highlightType === "good").length;
+    const poorCount = profileElements.filter(el => el.highlighted && el.highlightType === "poor").length;
+    
+    return (
+      <div className="mt-3 p-3 bg-neutral-50 border border-neutral-200 rounded-md">
+        <h4 className="font-medium text-sm mb-2">Current Feedback Summary</h4>
+        <div className="flex flex-wrap gap-2">
+          <div className="flex items-center">
+            <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1"></span>
+            <span className="text-sm">{goodCount} good match{goodCount !== 1 ? 'es' : ''}</span>
+          </div>
+          <div className="flex items-center ml-4">
+            <span className="inline-block w-3 h-3 rounded-full bg-red-500 mr-1"></span>
+            <span className="text-sm">{poorCount} poor match{poorCount !== 1 ? 'es' : ''}</span>
+          </div>
+          {goodCount === 0 && poorCount === 0 && (
+            <span className="text-sm text-neutral-500 italic">No elements highlighted yet</span>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   const handleSubmit = async () => {
     if (!candidate) {
@@ -77,14 +102,24 @@ const CandidateFeedback: React.FC<CandidateFeedbackProps> = ({
 
     setIsSubmitting(true);
 
-    // Extract good and poor match elements
+    // Extract good and poor match elements with improved formatting
+    const formatElementType = (type: string): string => {
+      switch(type) {
+        case "currentPosition": return "Current Position";
+        case "currentWorkplace": return "Current Workplace";
+        case "pastPosition": return "Past Position";
+        case "pastWorkplace": return "Past Workplace";
+        default: return type.charAt(0).toUpperCase() + type.slice(1);
+      }
+    };
+    
     const goodMatchElements = profileElements
       .filter(el => el.highlighted && el.highlightType === "good")
-      .map(el => `${el.type}: ${el.value}`);
+      .map(el => `${formatElementType(el.type)}: ${el.value}`);
       
     const poorMatchElements = profileElements
       .filter(el => el.highlighted && el.highlightType === "poor")
-      .map(el => `${el.type}: ${el.value}`);
+      .map(el => `${formatElementType(el.type)}: ${el.value}`);
 
     try {
       // In a real implementation, we would use the actual candidate ID from the database
@@ -180,7 +215,10 @@ const CandidateFeedback: React.FC<CandidateFeedbackProps> = ({
               Select which elements of the candidate's profile are good or poor matches for your search criteria.
             </p>
             
-            <div className="space-y-3">
+            {/* Highlight Summary */}
+            {getHighlightSummary()}
+            
+            <div className="space-y-3 mt-4">
               {profileElements.map(element => (
                 <div 
                   key={element.id} 
@@ -191,11 +229,23 @@ const CandidateFeedback: React.FC<CandidateFeedbackProps> = ({
                   }`}
                 >
                   <div className="flex justify-between items-center">
-                    <div>
-                      <div className="font-medium text-sm capitalize">{element.type}</div>
-                      <div>{element.value}</div>
+                    <div className="flex-1">
+                      <div className="font-medium text-sm capitalize">
+                        {element.type === "currentPosition" ? "Current Position" :
+                         element.type === "currentWorkplace" ? "Current Workplace" : 
+                         element.type === "pastPosition" ? "Past Position" :
+                         element.type === "pastWorkplace" ? "Past Workplace" :
+                         element.type}
+                      </div>
+                      <div className="break-words pr-2">{element.value}</div>
+                      
+                      {element.type === "specialization" && (
+                        <div className="mt-1 text-xs text-neutral-500">
+                          Specializations are specific areas of expertise within the profession
+                        </div>
+                      )}
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 flex-shrink-0">
                       <button
                         onClick={() => toggleElementHighlight(element.id, "good")}
                         className={`p-2 rounded-full ${
