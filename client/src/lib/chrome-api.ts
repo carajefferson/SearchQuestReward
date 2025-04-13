@@ -134,7 +134,7 @@ function mockGetCurrentTab(): Promise<ChromeTab> {
 
 function mockExtractSearchData(tab: ChromeTab): Promise<SearchData> {
   return Promise.resolve({
-    query: "medical assistant",
+    query: "",  // Empty string by default, so users can enter their own search term
     source: "LinkedIn",
     resultsCount: "About 1,200 results",
     results: [

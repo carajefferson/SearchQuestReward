@@ -50,7 +50,13 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
       <div className="mb-4">
         <h2 className="text-sm font-medium text-neutral-500">CURRENT SEARCH</h2>
         <div className="mt-1 p-3 bg-white rounded shadow-elevation-1">
-          <p className="font-medium">{currentSearch.query}</p>
+          <input 
+            type="text" 
+            defaultValue={currentSearch.query} 
+            className="w-full font-medium border-none p-0 focus:outline-none focus:ring-0"
+            placeholder="Enter search query"
+            aria-label="Search query"
+          />
           <div className="mt-2 flex items-center text-neutral-500 text-sm">
             <span className="material-icons text-sm mr-1">business</span>
             <span>{currentSearch.source}</span>
