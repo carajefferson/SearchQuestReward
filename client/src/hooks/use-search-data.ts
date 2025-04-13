@@ -291,18 +291,14 @@ export function useSearchData() {
     const isDev = process.env.NODE_ENV === 'development';
 
     if (isDev) {
-      // In development mode, update the local wallet balance - a simpler approach
+      // In development mode, use the wallet service
       const COINS_TO_ADD = 5;
       
-      // Dispatch an action to update the wallet directly
-      try {
-        // For development mode, this will dispatch an event that will update relevant components
-        window.dispatchEvent(new CustomEvent('wallet-update', { 
-          detail: { coinsAdded: COINS_TO_ADD } 
-        }));
-      } catch (error) {
-        console.error("Error updating wallet balance:", error);
-      }
+      // Import here to avoid circular dependencies
+      const { updateBalance } = await import('@/lib/wallet-service');
+      
+      // Update the wallet balance
+      updateBalance(COINS_TO_ADD);
       
       // Simulate a successful feedback submission
       toast({

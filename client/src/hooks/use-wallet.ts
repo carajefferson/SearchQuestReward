@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Transaction } from "@shared/schema";
+import { addBalanceUpdateListener, removeBalanceUpdateListener, getCurrentBalance } from "@/lib/wallet-service";
 
 interface WalletData {
   balance: number;
@@ -10,9 +11,8 @@ interface WalletData {
 export function useWallet() {
   // Track the local wallet balance to use as fallback when logged out
   const [localBalance, setLocalBalance] = useState<number>(() => {
-    // Initialize from localStorage if available
-    const stored = localStorage.getItem('wallet_balance');
-    return stored ? parseInt(stored, 10) : 0;
+    // Initialize from localStorage or wallet service
+    return getCurrentBalance();
   });
   
   const { 
@@ -34,25 +34,19 @@ export function useWallet() {
     }
   }, [data?.balance]);
   
-  // Listen for custom wallet update events (for development mode)
+  // Listen for wallet balance updates
   useEffect(() => {
-    const handleWalletUpdate = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      if (customEvent.detail && customEvent.detail.coinsAdded) {
-        const coinsToAdd = customEvent.detail.coinsAdded;
-        setLocalBalance(prev => {
-          const newBalance = prev + coinsToAdd;
-          // Update localStorage
-          localStorage.setItem('wallet_balance', newBalance.toString());
-          return newBalance;
-        });
-      }
+    // Handler for wallet balance updates
+    const handleBalanceUpdate = (newBalance: number) => {
+      setLocalBalance(newBalance);
     };
     
-    window.addEventListener('wallet-update', handleWalletUpdate);
+    // Register listener
+    addBalanceUpdateListener(handleBalanceUpdate);
     
+    // Clean up
     return () => {
-      window.removeEventListener('wallet-update', handleWalletUpdate);
+      removeBalanceUpdateListener(handleBalanceUpdate);
     };
   }, []);
   
