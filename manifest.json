@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "RecruiterPro Feedback",
+  "version": "1.0.0",
+  "description": "Provide feedback on candidate search results and earn coins in your wallet",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.linkedin.com/*",
+    "*://*.indeed.com/*",
+    "*://*.ziprecruiter.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.linkedin.com/search/results*",
+        "*://*.indeed.com/jobs*",
+        "*://*.ziprecruiter.com/candidate/search*"
+      ],
+      "js": ["content-script.js"]
+    }
+  ]
+}
