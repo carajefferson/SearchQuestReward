@@ -8,11 +8,6 @@ interface WalletTabProps {
 }
 
 const WalletTab: React.FC<WalletTabProps> = ({ balance, transactions }) => {
-  // Calculate progress towards next tier
-  const targetCoins = 100;
-  const progressPercentage = Math.min(Math.round((balance / targetCoins) * 100), 100);
-  const coinsToNextTier = targetCoins - balance > 0 ? targetCoins - balance : 0;
-  
   return (
     <div className="p-4">
       {/* Coin Balance Card */}
@@ -27,34 +22,6 @@ const WalletTab: React.FC<WalletTabProps> = ({ balance, transactions }) => {
         </div>
         
         <div className="p-4">
-          <div className="mb-4">
-            <h3 className="font-medium text-sm mb-2">REWARD PROGRESS</h3>
-            <div className="relative pt-1">
-              <div className="flex mb-2 items-center justify-between">
-                <div>
-                  <span className="text-xs font-medium inline-block py-1 px-2 uppercase rounded-full text-white bg-secondary">
-                    {balance >= targetCoins ? "Gold Tier" : "Silver Tier"}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <span className="text-xs font-medium inline-block text-secondary">
-                    {balance}/{targetCoins} coins
-                  </span>
-                </div>
-              </div>
-              <div className="overflow-hidden h-2 text-xs flex rounded bg-neutral-200">
-                <div 
-                  style={{ width: `${progressPercentage}%` }} 
-                  className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-secondary"
-                />
-              </div>
-              {coinsToNextTier > 0 && (
-                <div className="text-xs text-neutral-500 mt-1">
-                  Earn {coinsToNextTier} more coins to reach Gold Tier
-                </div>
-              )}
-            </div>
-          </div>
           
           <div>
             <h3 className="font-medium text-sm mb-2">REDEEM OPTIONS</h3>
