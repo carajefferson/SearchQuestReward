@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { SearchData, FeedbackSubmission, CandidateData } from "@shared/schema";
 import CandidateFeedback from "./candidate-feedback";
@@ -12,16 +12,27 @@ interface FeedbackTabProps {
   currentSearch: SearchData | null;
   searchResults: CandidateData[] | null;
   onSubmitFeedback: (feedback: FeedbackSubmission) => Promise<FeedbackResponse>;
+  onSubmitSearch: (query: string) => Promise<void>;
 }
 
 const FeedbackTab: React.FC<FeedbackTabProps> = ({ 
   currentSearch, 
   searchResults, 
-  onSubmitFeedback 
+  onSubmitFeedback,
+  onSubmitSearch
 }) => {
   const { toast } = useToast();
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<CandidateData | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Initialize search query from current search when component mounts
+  useEffect(() => {
+    if (currentSearch?.query) {
+      setSearchQuery(currentSearch.query);
+    }
+  }, [currentSearch?.query]);
 
   const toggleResults = () => {
     setIsExpanded(!isExpanded);
@@ -48,30 +59,72 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
       </div>
     );
   }
+  
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    
+    setIsSearching(true);
+    
+    try {
+      // Call our performSearch function from the hook
+      await onSubmitSearch(searchQuery);
+    } catch (error) {
+      console.error("Search error:", error);
+      toast({
+        title: "Search Failed",
+        description: "Unable to perform the search. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   return (
     <div className="p-4">
-      {/* Search Query Detected */}
+      {/* Search Query Input */}
       <div className="mb-4">
-        <h2 className="text-sm font-medium text-neutral-500">CURRENT SEARCH</h2>
+        <h2 className="text-sm font-medium text-neutral-500">SEARCH FOR CANDIDATES</h2>
         <div className="mt-1 p-3 bg-white rounded shadow-elevation-1">
-          <input 
-            type="text" 
-            defaultValue={currentSearch.query} 
-            className="w-full font-medium border-none p-0 focus:outline-none focus:ring-0"
-            placeholder="Enter search query"
-            aria-label="Search query"
-          />
-          <div className="mt-2 flex items-center text-neutral-500 text-sm">
-            <span className="material-icons text-sm mr-1">business</span>
-            <span>{currentSearch.source}</span>
-            {currentSearch.resultsCount && (
-              <>
-                <span className="mx-2">•</span>
-                <span>{currentSearch.resultsCount}</span>
-              </>
-            )}
-          </div>
+          <form onSubmit={handleSearch} className="flex items-center">
+            <input 
+              type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full font-medium border-none p-0 focus:outline-none focus:ring-0"
+              placeholder="Enter job title, skills, or keywords..."
+              aria-label="Search query"
+            />
+            <button 
+              type="submit"
+              className={`p-2 rounded-full text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary ${isSearching ? 'opacity-50' : ''}`}
+              disabled={isSearching}
+            >
+              <span className="material-icons">search</span>
+            </button>
+          </form>
+          
+          {currentSearch && (
+            <div className="mt-2 flex items-center justify-between text-neutral-500 text-sm">
+              <div className="flex items-center">
+                <span className="material-icons text-sm mr-1">business</span>
+                <span>{currentSearch.source}</span>
+                {currentSearch.resultsCount && (
+                  <>
+                    <span className="mx-2">•</span>
+                    <span>{currentSearch.resultsCount}</span>
+                  </>
+                )}
+              </div>
+              {isSearching && (
+                <div className="flex items-center text-primary">
+                  <span className="material-icons animate-spin mr-1">refresh</span>
+                  <span>Searching...</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

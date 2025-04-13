@@ -28,9 +28,9 @@ export async function getChromeCurrentTab(): Promise<ChromeTab | null> {
 }
 
 // Utility to extract search data from a tab
-export async function extractSearchData(tab: ChromeTab): Promise<SearchData | null> {
+export async function extractSearchData(tab: ChromeTab, searchQuery?: string): Promise<SearchData | null> {
   if (isDev || !window.chrome?.tabs || !tab.id) {
-    return mockExtractSearchData(tab);
+    return mockExtractSearchData(tab, searchQuery);
   }
   
   try {
@@ -132,116 +132,174 @@ function mockGetCurrentTab(): Promise<ChromeTab> {
   });
 }
 
-function mockExtractSearchData(tab: ChromeTab): Promise<SearchData> {
+function mockExtractSearchData(tab: ChromeTab, customQuery?: string): Promise<SearchData> {
+  const query = customQuery || "";
+  
+  // Create base mock data
+  const allResults = [
+    {
+      name: "Alexandra Gonzalez",
+      title: "Medical Assistant",
+      location: "Tustin CA",
+      currentPosition: "Medical Assistant",
+      currentWorkplace: "Tustin Ear Nose & Throat Sinus and Allergy Center",
+      education: "B.A Public Health",
+      specialization: "ENT & Allergy Care",
+      connectionType: "mutual connection",
+      mutualConnections: "Ben Lazaroff",
+      profileStatus: "2nd",
+      matchScore: 95,
+      profileElements: [
+        { id: "element2", type: "title", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "element3", type: "location", value: "Tustin CA", highlighted: false, highlightType: "neutral" },
+        { id: "element4", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "element5", type: "currentWorkplace", value: "Tustin Ear Nose & Throat Sinus and Allergy Center", highlighted: false, highlightType: "neutral" },
+        { id: "element6", type: "education", value: "B.A Public Health", highlighted: false, highlightType: "neutral" },
+        { id: "element7", type: "specialization", value: "ENT & Allergy Care", highlighted: false, highlightType: "neutral" },
+        { id: "element8", type: "skills", value: "Patient care, Medical records, Vital signs", highlighted: false, highlightType: "neutral" },
+        { id: "element9", type: "experience", value: "3+ years in clinical settings", highlighted: false, highlightType: "neutral" }
+      ]
+    },
+    {
+      name: "Isabella Teets",
+      title: "Medical Assistant",
+      location: "Newport Beach CA",
+      currentPosition: "Medical Assistant",
+      currentWorkplace: "Newport Family Medicine",
+      education: "B.S. Psychological and Brain Sciences",
+      specialization: "Primary Care & Geriatrics",
+      connectionType: "mutual connection",
+      mutualConnections: "Kumaresh Mudliar",
+      profileStatus: "2nd",
+      matchScore: 92,
+      profileElements: [
+        { id: "el2", type: "title", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "el3", type: "location", value: "Newport Beach CA", highlighted: false, highlightType: "neutral" },
+        { id: "el4", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+        { id: "el5", type: "currentWorkplace", value: "Newport Family Medicine", highlighted: false, highlightType: "neutral" },
+        { id: "el6", type: "education", value: "B.S. Psychological and Brain Sciences", highlighted: false, highlightType: "neutral" },
+        { id: "el7", type: "specialization", value: "Primary Care & Geriatrics", highlighted: false, highlightType: "neutral" },
+        { id: "el8", type: "skills", value: "Patient coordination, Medical records", highlighted: false, highlightType: "neutral" },
+        { id: "el9", type: "experience", value: "2 years in family medicine", highlighted: false, highlightType: "neutral" }
+      ]
+    },
+    {
+      name: "Ray W.",
+      title: "Medical Student",
+      location: "Cupertino CA",
+      currentPosition: "Computer Science Teacher",
+      currentWorkplace: "Washington University in St. Louis",
+      education: "Drexel University College of Medicine",
+      specialization: "Medical Education & Technology",
+      connectionType: "mutual connection",
+      mutualConnections: "Ron Cytron, Andrew D. Martin, and 22 other mutual connections",
+      profileStatus: "2nd",
+      matchScore: 78
+    },
+    {
+      name: "Margot Bellon",
+      title: "Medical Student",
+      location: "San Mateo CA",
+      pastPosition1: "Medical Fellow",
+      pastWorkplace1: "Saving Mothers",
+      education: "Drexel University College of Medicine",
+      specialization: "Women's Health & Global Medicine",
+      connectionType: "mutual connection",
+      mutualConnections: "Wauson Liang",
+      profileStatus: "2nd",
+      matchScore: 81
+    },
+    {
+      name: "Dexter Wong",
+      title: "Clinical Manager",
+      location: "San Francisco Bay Area",
+      currentPosition: "Medical Assistant",
+      currentWorkplace: "Grace Pacific Medical Associates",
+      specialization: "Primary Care & Clinical Management",
+      connectionType: "mutual connection",
+      mutualConnections: "Jerry Lee",
+      profileStatus: "2nd",
+      matchScore: 88
+    },
+    {
+      name: "Kaiti Ness",
+      title: "Pre-Med Medical Assistant",
+      location: "Dallas TX",
+      currentPosition: "Medical Assistant",
+      currentWorkplace: "Advanced Dermatology and Cosmetic Surgery",
+      specialization: "Dermatology & Cosmetic Procedures",
+      connectionType: "mutual connection",
+      mutualConnections: "Matthew Zweig",
+      profileStatus: "2nd",
+      matchScore: 90
+    },
+    {
+      name: "Vincent Pham",
+      title: "Medical Assistant",
+      location: "Pittsburg CA",
+      currentPosition: "Medical Assistant",
+      currentWorkplace: "Golden State Dermatology",
+      education: "UC Santa Barbara Biopsychology Alumni",
+      specialization: "Dermatology & Skin Care",
+      connectionType: "mutual connection",
+      mutualConnections: "Kumaresh Mudliar",
+      profileStatus: "2nd",
+      matchScore: 94
+    },
+    {
+      name: "Sarah Johnson",
+      title: "Pediatric Medical Assistant",
+      location: "San Diego CA",
+      currentPosition: "Medical Assistant",
+      currentWorkplace: "Children's Primary Care Medical Group",
+      education: "B.S. Child Development",
+      specialization: "Pediatric Care",
+      connectionType: "mutual connection",
+      mutualConnections: "Melissa Chen",
+      profileStatus: "2nd",
+      matchScore: 93
+    },
+    {
+      name: "Michael Rodriguez",
+      title: "Cardiology Medical Assistant",
+      location: "Los Angeles CA",
+      currentPosition: "Medical Assistant",
+      currentWorkplace: "Cedars-Sinai Heart Institute",
+      education: "Associate's Degree in Medical Assisting",
+      specialization: "Cardiology & EKG Monitoring",
+      connectionType: "mutual connection",
+      mutualConnections: "David Park",
+      profileStatus: "2nd",
+      matchScore: 91
+    }
+  ];
+  
+  // If there's a search query, filter the results based on it
+  let filteredResults = allResults;
+  let resultsCount = "About 1,200 results";
+  
+  if (query) {
+    const lowercaseQuery = query.toLowerCase();
+    filteredResults = allResults.filter(candidate => {
+      // Check various fields for matches
+      return (
+        (candidate.title && candidate.title.toLowerCase().includes(lowercaseQuery)) ||
+        (candidate.currentPosition && candidate.currentPosition.toLowerCase().includes(lowercaseQuery)) ||
+        (candidate.specialization && candidate.specialization.toLowerCase().includes(lowercaseQuery)) ||
+        (candidate.currentWorkplace && candidate.currentWorkplace.toLowerCase().includes(lowercaseQuery)) ||
+        (candidate.location && candidate.location.toLowerCase().includes(lowercaseQuery))
+      );
+    });
+    
+    // Adjust the results count based on the filtering
+    resultsCount = `About ${filteredResults.length * 120} results`;
+  }
+  
   return Promise.resolve({
-    query: "",  // Empty string by default, so users can enter their own search term
+    query: query,
     source: "LinkedIn",
-    resultsCount: "About 1,200 results",
-    results: [
-      {
-        name: "Alexandra Gonzalez",
-        title: "Medical assistant",
-        location: "Tustin CA",
-        currentPosition: "Medical Assistant",
-        currentWorkplace: "Tustin Ear Nose & Throat Sinus and Allergy Center",
-        education: "B.A Public Health",
-        specialization: "Medical assistant",
-        connectionType: "mutual connection",
-        mutualConnections: "Ben Lazaroff",
-        profileStatus: "2nd",
-        matchScore: 95,
-        profileElements: [
-          { id: "element2", type: "title", value: "Medical assistant", highlighted: false, highlightType: "neutral" },
-          { id: "element3", type: "location", value: "Tustin CA", highlighted: false, highlightType: "neutral" },
-          { id: "element4", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
-          { id: "element5", type: "currentWorkplace", value: "Tustin Ear Nose & Throat Sinus and Allergy Center", highlighted: false, highlightType: "neutral" },
-          { id: "element6", type: "education", value: "B.A Public Health", highlighted: false, highlightType: "neutral" },
-          { id: "element7", type: "specialization", value: "ENT & Allergy Care", highlighted: false, highlightType: "neutral" },
-          { id: "element8", type: "skills", value: "Patient care, Medical records, Vital signs", highlighted: false, highlightType: "neutral" },
-          { id: "element9", type: "experience", value: "3+ years in clinical settings", highlighted: false, highlightType: "neutral" }
-        ]
-      },
-      {
-        name: "Isabella Teets",
-        title: "Medical Assistant",
-        location: "Newport Beach CA",
-        currentPosition: "Medical Assistant",
-        currentWorkplace: "Newport Family Medicine",
-        education: "B.S. Psychological and Brain Sciences",
-        connectionType: "mutual connection",
-        mutualConnections: "Kumaresh Mudliar",
-        profileStatus: "2nd",
-        matchScore: 92,
-        profileElements: [
-          { id: "el2", type: "title", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
-          { id: "el3", type: "location", value: "Newport Beach CA", highlighted: false, highlightType: "neutral" },
-          { id: "el4", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
-          { id: "el5", type: "currentWorkplace", value: "Newport Family Medicine", highlighted: false, highlightType: "neutral" },
-          { id: "el6", type: "education", value: "B.S. Psychological and Brain Sciences", highlighted: false, highlightType: "neutral" },
-          { id: "el7", type: "specialization", value: "Primary Care & Geriatrics", highlighted: false, highlightType: "neutral" },
-          { id: "el8", type: "skills", value: "Patient coordination, Medical records", highlighted: false, highlightType: "neutral" },
-          { id: "el9", type: "experience", value: "2 years in family medicine", highlighted: false, highlightType: "neutral" }
-        ]
-      },
-      {
-        name: "Ray W.",
-        title: "Medical Student",
-        location: "Cupertino CA",
-        currentPosition: "Computer Science Teacher",
-        currentWorkplace: "Washington University in St. Louis",
-        education: "Drexel University College of Medicine",
-        connectionType: "mutual connection",
-        mutualConnections: "Ron Cytron, Andrew D. Martin, and 22 other mutual connections",
-        profileStatus: "2nd",
-        matchScore: 78
-      },
-      {
-        name: "Margot Bellon",
-        title: "Medical Student",
-        location: "San Mateo CA",
-        pastPosition1: "Medical Fellow",
-        pastWorkplace1: "Saving Mothers",
-        education: "Drexel University College of Medicine",
-        connectionType: "mutual connection",
-        mutualConnections: "Wauson Liang",
-        profileStatus: "2nd",
-        matchScore: 81
-      },
-      {
-        name: "Dexter Wong",
-        title: "Clinical Manager",
-        location: "San Francisco Bay Area",
-        currentPosition: "Medical Assistant",
-        currentWorkplace: "Grace Pacific Medical Associates",
-        connectionType: "mutual connection",
-        mutualConnections: "Jerry Lee",
-        profileStatus: "2nd",
-        matchScore: 88
-      },
-      {
-        name: "Kaiti Ness",
-        title: "Pre-Med Medical Assistant",
-        location: "Dallas TX",
-        currentPosition: "Medical Assistant",
-        currentWorkplace: "Advanced Dermatology and Cosmetic Surgery",
-        connectionType: "mutual connection",
-        mutualConnections: "Matthew Zweig",
-        profileStatus: "2nd",
-        matchScore: 90
-      },
-      {
-        name: "Vincent Pham",
-        title: "Medical Assistant",
-        location: "Pittsburg CA",
-        currentPosition: "Medical Assistant",
-        currentWorkplace: "Golden State Dermatology",
-        education: "UC Santa Barbara Biopsychology Alumni",
-        connectionType: "mutual connection",
-        mutualConnections: "Kumaresh Mudliar",
-        profileStatus: "2nd",
-        matchScore: 94
-      }
-    ]
+    resultsCount: resultsCount,
+    results: filteredResults
   });
 }
 

@@ -16,7 +16,8 @@ const Home = () => {
   const { 
     currentSearch,
     searchResults,
-    submitFeedback
+    submitFeedback,
+    performSearch
   } = useSearchData();
 
   return (
@@ -53,6 +54,7 @@ const Home = () => {
             currentSearch={currentSearch}
             searchResults={searchResults}
             onSubmitFeedback={submitFeedback}
+            onSubmitSearch={performSearch}
           />
         ) : (
           <WalletTab 

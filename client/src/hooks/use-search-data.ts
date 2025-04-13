@@ -17,6 +17,51 @@ export function useSearchData() {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  
+  // Function to perform a search with a specific query
+  const performSearch = async (query: string): Promise<void> => {
+    try {
+      setIsLoading(true);
+      const tab = await getChromeCurrentTab();
+      
+      if (tab) {
+        // Pass the search query to extractSearchData
+        const searchData = await extractSearchData(tab, query);
+        
+        if (searchData) {
+          // Update the search query with the user's input
+          searchData.query = query;
+          
+          setCurrentSearch(searchData);
+          setSearchResults(searchData.results);
+          
+          // Submit the search data to the server
+          try {
+            const response = await apiRequest("POST", "/api/searches", searchData);
+            const data = await response.json();
+            setSearchId(data.searchId);
+          } catch (err) {
+            console.error("Error submitting search to server:", err);
+          }
+        } else {
+          toast({
+            title: "Search Failed",
+            description: "Unable to perform search. Please try again.",
+            variant: "destructive",
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error performing search:", error);
+      toast({
+        title: "Search Error",
+        description: "An error occurred while performing the search.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Load search data from the current tab
   useEffect(() => {
@@ -98,5 +143,6 @@ export function useSearchData() {
     searchResults,
     isLoading,
     submitFeedback,
+    performSearch,
   };
 }
