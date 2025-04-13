@@ -93,6 +93,29 @@ export function useSearchData() {
           { id: "vp7", type: "skills", value: "Patient care, Dermatology procedures, Medical records", highlighted: false, highlightType: "neutral" },
           { id: "vp8", type: "experience", value: "2+ years in dermatology practice", highlighted: false, highlightType: "neutral" }
         ]
+      },
+      {
+        name: "Ray W.",
+        title: "Data Labeler",
+        location: "Cupertino CA",
+        currentPosition: "Data Labeler",
+        currentWorkplace: "Google",
+        education: "Stanford University",
+        specialization: "Machine Learning",
+        connectionType: "mutual connection",
+        mutualConnections: "Jane Doe",
+        profileStatus: "1st",
+        matchScore: 78,
+        profileElements: [
+          { id: "rw1", type: "title", value: "Medical Student", highlighted: false, highlightType: "neutral" },
+          { id: "rw2", type: "location", value: "Cupertino CA", highlighted: false, highlightType: "neutral" },
+          { id: "rw3", type: "currentPosition", value: "Computer Science Teacher", highlighted: false, highlightType: "neutral" },
+          { id: "rw4", type: "currentWorkplace", value: "Washington University in St. Louis", highlighted: false, highlightType: "neutral" },
+          { id: "rw5", type: "education", value: "Drexel University College of Medicine", highlighted: false, highlightType: "neutral" },
+          { id: "rw6", type: "specialization", value: "Medical Education & Technology", highlighted: false, highlightType: "neutral" },
+          { id: "rw7", type: "skills", value: "Teaching, Computer Science, Medical Education", highlighted: false, highlightType: "neutral" },
+          { id: "rw8", type: "experience", value: "Teaching Computer Science at University Level", highlighted: false, highlightType: "neutral" }
+        ]
       }
     ]
   };
@@ -103,32 +126,32 @@ export function useSearchData() {
   const [isLoading, setIsLoading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  
+
   // Function to perform a search with a specific query
   const performSearch = async (query: string): Promise<void> => {
     try {
       setIsLoading(true);
-      
+
       // Check if we're in development mode
       const isDev = process.env.NODE_ENV === 'development';
-      
+
       if (isDev) {
         // In development mode, just use the mock data
         const tab = await getChromeCurrentTab();
-        
+
         // If we don't get a tab back, create a mock one
         const mockTab: ChromeTab = tab || { 
           id: 1, 
           url: "https://www.linkedin.com/search/results/people/?keywords=" + encodeURIComponent(query) 
         };
-        
+
         const searchData = await extractSearchData(mockTab, query);
-        
+
         if (searchData) {
           // Update the current search and results
           setCurrentSearch(searchData);
           setSearchResults(searchData.results);
-          
+
           // No need to submit to server in dev mode
         } else {
           toast({
@@ -140,18 +163,18 @@ export function useSearchData() {
       } else {
         // In production/extension mode, use the Chrome API
         const tab = await getChromeCurrentTab();
-        
+
         if (tab) {
           // Pass the search query to extractSearchData
           const searchData = await extractSearchData(tab, query);
-          
+
           if (searchData) {
             // Update the search query with the user's input
             searchData.query = query;
-            
+
             setCurrentSearch(searchData);
             setSearchResults(searchData.results);
-            
+
             // Submit the search data to the server
             try {
               const response = await apiRequest("POST", "/api/searches", searchData);
@@ -186,21 +209,21 @@ export function useSearchData() {
     const loadSearchData = async () => {
       try {
         setIsLoading(true);
-        
+
         // We're already initializing with default data, so no need to try loading
         // from the server in development mode since we don't have auth set up
         const isDev = process.env.NODE_ENV === 'development';
-        
+
         if (!isDev) {
           const tab = await getChromeCurrentTab();
-          
+
           if (tab && tab.url) {
             const searchData = await extractSearchData(tab);
-            
+
             if (searchData) {
               setCurrentSearch(searchData);
               setSearchResults(searchData.results);
-              
+
               // Submit the search data to the server
               try {
                 const response = await apiRequest("POST", "/api/searches", searchData);
@@ -232,7 +255,7 @@ export function useSearchData() {
       // Force invalidate wallet data to refresh balance
       queryClient.invalidateQueries({ queryKey: ["/api/wallet"] });
       queryClient.refetchQueries({ queryKey: ["/api/wallet"] });
-      
+
       toast({
         title: "Feedback submitted!",
         description: `Thank you! +${data.coinsAwarded || 5} coins added to your wallet.`,
@@ -266,14 +289,14 @@ export function useSearchData() {
 
     // Check if we're in development mode
     const isDev = process.env.NODE_ENV === 'development';
-    
+
     if (isDev) {
       // In development mode, just simulate a successful feedback submission
       toast({
         title: "Feedback submitted!",
         description: "Thank you! +5 coins added to your wallet.",
       });
-      
+
       // Return a mock response
       return { coinsAwarded: 5 };
     } else {
