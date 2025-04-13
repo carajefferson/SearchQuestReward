@@ -77,8 +77,11 @@ export const feedback = pgTable("feedback", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").notNull(),
   searchId: integer("search_id").notNull(),
+  candidateId: integer("candidate_id").notNull(),
   relevanceRating: integer("relevance_rating").notNull(),
   qualityRating: integer("quality_rating").notNull(),
+  goodMatchElements: text("good_match_elements").array(), 
+  poorMatchElements: text("poor_match_elements").array(),
   comment: text("comment"),
   timestamp: timestamp("timestamp").notNull().defaultNow(),
 });
@@ -86,8 +89,11 @@ export const feedback = pgTable("feedback", {
 export const insertFeedbackSchema = createInsertSchema(feedback).pick({
   userId: true,
   searchId: true,
+  candidateId: true,
   relevanceRating: true,
   qualityRating: true,
+  goodMatchElements: true,
+  poorMatchElements: true,
   comment: true,
 });
 
@@ -131,9 +137,33 @@ export const insertSettingsSchema = createInsertSchema(settings).pick({
 // Zod schemas for API validation
 export const feedbackSubmissionSchema = z.object({
   searchId: z.number(),
+  candidateId: z.number(),
   relevanceRating: z.number().min(1).max(5),
   qualityRating: z.number().min(1).max(5),
+  goodMatchElements: z.array(z.string()).optional().default([]),
+  poorMatchElements: z.array(z.string()).optional().default([]),
   comment: z.string().optional(),
+});
+
+// Define profile elements that can be highlighted
+export const profileElementSchema = z.object({
+  id: z.string(),  // Unique ID for the element
+  type: z.enum([
+    "name",
+    "title",
+    "location",
+    "currentPosition",
+    "currentWorkplace",
+    "pastPosition",
+    "pastWorkplace",
+    "education",
+    "specialization",
+    "skills",
+    "experience"
+  ]),
+  value: z.string(),
+  highlighted: z.boolean().optional().default(false),
+  highlightType: z.enum(["good", "poor", "neutral"]).optional().default("neutral"),
 });
 
 // Candidate search data schema
@@ -152,6 +182,7 @@ export const candidateDataSchema = z.object({
   profileStatus: z.string().optional(),
   profileUrl: z.string().optional(),
   matchScore: z.number().optional(),
+  profileElements: z.array(profileElementSchema).optional().default([]),
 });
 
 export const searchDataSchema = z.object({
@@ -186,3 +217,4 @@ export type InsertSettings = z.infer<typeof insertSettingsSchema>;
 export type FeedbackSubmission = z.infer<typeof feedbackSubmissionSchema>;
 export type SearchData = z.infer<typeof searchDataSchema>;
 export type CandidateData = z.infer<typeof candidateDataSchema>;
+export type ProfileElement = z.infer<typeof profileElementSchema>;

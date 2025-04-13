@@ -149,7 +149,18 @@ function mockExtractSearchData(tab: ChromeTab): Promise<SearchData> {
         connectionType: "mutual connection",
         mutualConnections: "Ben Lazaroff",
         profileStatus: "2nd",
-        matchScore: 95
+        matchScore: 95,
+        profileElements: [
+          { id: "element1", type: "name", value: "Alexandra Gonzalez", highlighted: false, highlightType: "neutral" },
+          { id: "element2", type: "title", value: "Medical assistant", highlighted: false, highlightType: "neutral" },
+          { id: "element3", type: "location", value: "Tustin CA", highlighted: false, highlightType: "neutral" },
+          { id: "element4", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+          { id: "element5", type: "currentWorkplace", value: "Tustin Ear Nose & Throat Sinus and Allergy Center", highlighted: false, highlightType: "neutral" },
+          { id: "element6", type: "education", value: "B.A Public Health", highlighted: false, highlightType: "neutral" },
+          { id: "element7", type: "specialization", value: "Medical assistant", highlighted: false, highlightType: "neutral" },
+          { id: "element8", type: "skills", value: "Patient care, Medical records, Vital signs", highlighted: false, highlightType: "neutral" },
+          { id: "element9", type: "experience", value: "3+ years in clinical settings", highlighted: false, highlightType: "neutral" }
+        ]
       },
       {
         name: "Isabella Teets",
@@ -161,7 +172,17 @@ function mockExtractSearchData(tab: ChromeTab): Promise<SearchData> {
         connectionType: "mutual connection",
         mutualConnections: "Kumaresh Mudliar",
         profileStatus: "2nd",
-        matchScore: 92
+        matchScore: 92,
+        profileElements: [
+          { id: "el1", type: "name", value: "Isabella Teets", highlighted: false, highlightType: "neutral" },
+          { id: "el2", type: "title", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+          { id: "el3", type: "location", value: "Newport Beach CA", highlighted: false, highlightType: "neutral" },
+          { id: "el4", type: "currentPosition", value: "Medical Assistant", highlighted: false, highlightType: "neutral" },
+          { id: "el5", type: "currentWorkplace", value: "Newport Family Medicine", highlighted: false, highlightType: "neutral" },
+          { id: "el6", type: "education", value: "B.S. Psychological and Brain Sciences", highlighted: false, highlightType: "neutral" },
+          { id: "el7", type: "skills", value: "Patient coordination, Medical records", highlighted: false, highlightType: "neutral" },
+          { id: "el8", type: "experience", value: "2 years in family medicine", highlighted: false, highlightType: "neutral" }
+        ]
       },
       {
         name: "Ray W.",

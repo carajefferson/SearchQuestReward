@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { SearchData, FeedbackSubmission, CandidateData } from "@shared/schema";
+import CandidateFeedback from "./candidate-feedback";
 
 interface FeedbackTabProps {
   currentSearch: SearchData | null;
@@ -14,73 +15,19 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
   onSubmitFeedback 
 }) => {
   const { toast } = useToast();
-  const [relevanceRating, setRelevanceRating] = useState<number | null>(null);
-  const [qualityRating, setQualityRating] = useState<number | null>(null);
-  const [comment, setComment] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleRelevanceRating = (rating: number) => {
-    setRelevanceRating(rating);
-  };
-
-  const handleQualityRating = (rating: number) => {
-    setQualityRating(rating);
-  };
-
-  const handleSubmit = async () => {
-    if (!currentSearch) {
-      toast({
-        title: "Error",
-        description: "No candidate search data available to submit feedback for.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (relevanceRating === null || qualityRating === null) {
-      toast({
-        title: "Please complete your ratings",
-        description: "Both relevance and quality ratings are required.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      await onSubmitFeedback({
-        searchId: 1, // This would come from the actual search data in a real implementation
-        relevanceRating,
-        qualityRating,
-        comment: comment.trim() || undefined,
-      });
-
-      toast({
-        title: "Feedback submitted!",
-        description: "Thank you! +5 coins added to your wallet.",
-        variant: "default",
-      });
-
-      // Reset form
-      setRelevanceRating(null);
-      setQualityRating(null);
-      setComment("");
-    } catch (error) {
-      console.error("Error submitting feedback:", error);
-      toast({
-        title: "Submission failed",
-        description: "There was an error submitting your feedback. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const [selectedCandidate, setSelectedCandidate] = useState<CandidateData | null>(null);
 
   const toggleResults = () => {
     setIsExpanded(!isExpanded);
+  };
+
+  const handleCandidateSelect = (candidate: CandidateData) => {
+    setSelectedCandidate(candidate);
+  };
+
+  const handleCloseFeedback = () => {
+    setSelectedCandidate(null);
   };
 
   if (!currentSearch || !searchResults) {
@@ -120,7 +67,7 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
       {/* Candidate Results Preview */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-neutral-500">TOP CANDIDATES</h2>
+          <h2 className="text-sm font-medium text-neutral-500">CANDIDATES</h2>
           <button 
             className="text-primary text-sm flex items-center"
             onClick={toggleResults}
@@ -133,8 +80,12 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
         </div>
         
         <div className="mt-1 space-y-2">
-          {searchResults.slice(0, 3).map((candidate, index) => (
-            <div key={`candidate-${index}`} className="p-3 bg-white rounded shadow-elevation-1">
+          {searchResults.slice(0, isExpanded ? searchResults.length : 3).map((candidate, index) => (
+            <div 
+              key={`candidate-${index}`} 
+              className="p-3 bg-white rounded shadow-elevation-1 cursor-pointer hover:shadow-elevation-2 transition-shadow"
+              onClick={() => handleCandidateSelect(candidate)}
+            >
               <div className="flex justify-between items-start">
                 <h3 className="font-medium text-base truncate">{candidate.name}</h3>
                 {candidate.matchScore && (
@@ -182,165 +133,81 @@ const FeedbackTab: React.FC<FeedbackTabProps> = ({
                 </div>
               )}
               
-              {candidate.connectionType && (
-                <div className="mt-2 flex items-center text-xs text-primary">
-                  <span className="material-icons text-xs mr-1">people</span>
-                  <span>{candidate.connectionType} • {candidate.mutualConnections || candidate.profileStatus}</span>
-                </div>
-              )}
+              <div className="mt-3 flex justify-between items-center">
+                {candidate.connectionType && (
+                  <div className="flex items-center text-xs text-primary">
+                    <span className="material-icons text-xs mr-1">people</span>
+                    <span>{candidate.connectionType} • {candidate.mutualConnections || candidate.profileStatus}</span>
+                  </div>
+                )}
+                
+                <button 
+                  className="px-3 py-1 text-xs bg-primary text-white rounded shadow-sm hover:bg-primary-dark transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCandidateSelect(candidate);
+                  }}
+                >
+                  <span className="flex items-center">
+                    <span className="material-icons text-xs mr-1">rate_review</span>
+                    Give Feedback
+                  </span>
+                </button>
+              </div>
             </div>
           ))}
-          
-          {isExpanded && searchResults.length > 3 && (
-            <div className="space-y-2 mt-2">
-              {searchResults.slice(3).map((candidate, index) => (
-                <div key={`expanded-candidate-${index}`} className="p-3 bg-white rounded shadow-elevation-1">
-                  <div className="flex justify-between items-start">
-                    <h3 className="font-medium text-base truncate">{candidate.name}</h3>
-                    {candidate.matchScore && (
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        candidate.matchScore >= 90 ? "bg-green-100 text-green-800" : 
-                        candidate.matchScore >= 80 ? "bg-blue-100 text-blue-800" : 
-                        "bg-yellow-100 text-yellow-800"
-                      }`}>
-                        {candidate.matchScore}% Match
-                      </span>
-                    )}
-                  </div>
-                  
-                  <div className="mt-1 text-sm text-neutral-600">
-                    <div className="flex items-center">
-                      <span className="material-icons text-xs mr-1">work</span>
-                      <span>{candidate.currentPosition || candidate.title || "Not specified"}</span>
-                    </div>
-                    {candidate.currentWorkplace && (
-                      <div className="flex items-center mt-0.5">
-                        <span className="material-icons text-xs mr-1">business</span>
-                        <span>{candidate.currentWorkplace}</span>
-                      </div>
-                    )}
-                    {candidate.location && (
-                      <div className="flex items-center mt-0.5">
-                        <span className="material-icons text-xs mr-1">location_on</span>
-                        <span>{candidate.location}</span>
-                      </div>
-                    )}
-                    {candidate.education && (
-                      <div className="flex items-center mt-0.5">
-                        <span className="material-icons text-xs mr-1">school</span>
-                        <span>{candidate.education}</span>
-                      </div>
-                    )}
-                  </div>
-                  
-                  {candidate.pastPosition1 && candidate.pastWorkplace1 && (
-                    <div className="mt-2 text-xs text-neutral-500">
-                      <div className="flex items-center">
-                        <span className="material-icons text-xs mr-1">history</span>
-                        <span>Previous: {candidate.pastPosition1} at {candidate.pastWorkplace1}</span>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {candidate.connectionType && (
-                    <div className="mt-2 flex items-center text-xs text-primary">
-                      <span className="material-icons text-xs mr-1">people</span>
-                      <span>{candidate.connectionType} • {candidate.mutualConnections || candidate.profileStatus}</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Feedback Form */}
-      <div className="bg-white rounded shadow-elevation-1 mb-4 overflow-hidden">
-        <div className="p-4">
-          <h2 className="font-medium mb-3">Rate these candidate results</h2>
-          
-          {/* Relevance Rating */}
-          <div className="mb-4">
-            <label className="block text-sm text-neutral-600 mb-1">Relevance to your search criteria</label>
-            <div className="flex space-x-1">
-              {[1, 2, 3, 4, 5].map((rating) => (
-                <button
-                  key={`relevance-${rating}`}
-                  className={`w-10 h-10 flex items-center justify-center rounded-full ripple focus:outline-none focus:ring-2 focus:ring-primary ${
-                    relevanceRating === rating
-                      ? "bg-primary text-white border-primary"
-                      : "border border-neutral-300 text-neutral-600 hover:bg-neutral-100"
-                  }`}
-                  onClick={() => handleRelevanceRating(rating)}
-                >
-                  {rating}
-                </button>
-              ))}
-            </div>
-            <div className="flex justify-between text-xs text-neutral-500 mt-1">
-              <span>Not relevant</span>
-              <span>Very relevant</span>
-            </div>
-          </div>
-          
-          {/* Quality Rating */}
-          <div className="mb-4">
-            <label className="block text-sm text-neutral-600 mb-1">Quality of candidates</label>
-            <div className="flex space-x-1">
-              {[1, 2, 3, 4, 5].map((rating) => (
-                <button
-                  key={`quality-${rating}`}
-                  className={`w-10 h-10 flex items-center justify-center rounded-full ripple focus:outline-none focus:ring-2 focus:ring-primary ${
-                    qualityRating === rating
-                      ? "bg-primary text-white border-primary"
-                      : "border border-neutral-300 text-neutral-600 hover:bg-neutral-100"
-                  }`}
-                  onClick={() => handleQualityRating(rating)}
-                >
-                  {rating}
-                </button>
-              ))}
-            </div>
-            <div className="flex justify-between text-xs text-neutral-500 mt-1">
-              <span>Poor quality</span>
-              <span>Excellent quality</span>
-            </div>
-          </div>
-          
-          {/* Comment */}
-          <div className="mb-4">
-            <label htmlFor="feedback-comment" className="block text-sm text-neutral-600 mb-1">
-              Additional comments (optional)
-            </label>
-            <textarea
-              id="feedback-comment"
-              rows={3}
-              className="w-full px-3 py-2 border border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-              placeholder="What could be improved about these candidate matches?"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-            />
-          </div>
         </div>
         
-        {/* Reward Info */}
-        <div className="bg-neutral-100 p-4 border-t border-neutral-200">
-          <div className="flex items-center">
-            <span className="material-icons text-secondary mr-2">stars</span>
-            <p className="text-sm">You'll earn <span className="font-medium">5 coins</span> for your feedback</p>
-          </div>
-          
-          {/* Submit Button */}
+        {!isExpanded && searchResults.length > 3 && (
           <button 
-            className="mt-3 w-full py-2 px-4 bg-primary text-white rounded ripple shadow-elevation-1 hover:bg-primary-light focus:outline-none focus:ring-2 focus:ring-primary-dark"
-            onClick={handleSubmit}
-            disabled={isSubmitting || relevanceRating === null || qualityRating === null}
+            className="mt-3 w-full py-2 text-sm text-primary border border-primary rounded hover:bg-primary-50 transition-colors"
+            onClick={toggleResults}
           >
-            {isSubmitting ? "Submitting..." : "Submit Feedback"}
+            Show {searchResults.length - 3} more candidates
           </button>
+        )}
+      </div>
+
+      {/* Instructions Card */}
+      <div className="bg-white rounded shadow-elevation-1 p-4 text-center mb-4">
+        <span className="material-icons text-primary text-2xl mb-2">touch_app</span>
+        <h3 className="font-medium mb-1">Select a Candidate</h3>
+        <p className="text-neutral-600 text-sm">
+          Click on any candidate to provide detailed feedback on how well they match your search criteria.
+        </p>
+        <div className="mt-3 flex items-center justify-center text-sm">
+          <div className="flex items-center mx-2">
+            <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1"></span>
+            <span>Good match</span>
+          </div>
+          <div className="flex items-center mx-2">
+            <span className="inline-block w-3 h-3 rounded-full bg-red-500 mr-1"></span>
+            <span>Poor match</span>
+          </div>
         </div>
       </div>
+      
+      {/* Help Section */}
+      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex items-start">
+          <span className="material-icons text-blue-500 mr-2 mt-0.5">info</span>
+          <div>
+            <p className="text-sm text-blue-800">
+              Your feedback on each candidate helps us improve our matching algorithm. For each candidate you review, you'll earn <span className="font-medium">5 coins</span> in your wallet!
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Candidate Feedback Modal */}
+      {selectedCandidate && (
+        <CandidateFeedback 
+          candidate={selectedCandidate}
+          searchId={1} // This would be the actual search ID in a real implementation
+          onSubmitFeedback={onSubmitFeedback}
+          onClose={handleCloseFeedback}
+        />
+      )}
     </div>
   );
 };
