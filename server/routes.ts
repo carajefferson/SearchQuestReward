@@ -123,17 +123,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const search = await storage.createSearch({
         userId: req.session.userId,
         query: searchData.query,
-        engine: searchData.engine,
+        source: searchData.source,
         resultsCount: searchData.resultsCount,
       });
       
-      // Create search results
-      for (const result of searchData.results) {
+      // Create search results for each candidate
+      for (const candidate of searchData.results) {
         await storage.createSearchResult({
           searchId: search.id,
-          title: result.title,
-          snippet: result.snippet,
-          url: result.url,
+          candidateId: 1, // This would be a real candidate ID in production
+          matchScore: candidate.matchScore || 0,
+          highlighted: false
         });
       }
       
@@ -162,38 +162,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Search not found" });
       }
       
-      // Create feedback record
+      // Create feedback record with candidate-specific details
       const newFeedback = await storage.createFeedback({
         userId: req.session.userId,
         searchId: feedbackData.searchId,
+        candidateId: feedbackData.candidateId,
         relevanceRating: feedbackData.relevanceRating,
         qualityRating: feedbackData.qualityRating,
+        goodMatchElements: feedbackData.goodMatchElements || [],
+        poorMatchElements: feedbackData.poorMatchElements || [],
         comment: feedbackData.comment,
       });
       
-      // Award coins for feedback
+      // Storage.createFeedback already handles awarding coins and creating the transaction
+      // Get the updated user data with new balance
       const user = await storage.getUser(req.session.userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
       
-      const rewardAmount = 5; // Fixed reward amount for feedback
-      const newBalance = user.coinBalance + rewardAmount;
-      
-      // Update user's coin balance
-      await storage.updateUserCoinBalance(user.id, newBalance);
-      
-      // Record transaction
-      await storage.createTransaction({
-        userId: user.id,
-        amount: rewardAmount,
-        description: "Feedback Reward",
-      });
-      
       return res.status(201).json({
         feedbackId: newFeedback.id,
-        coinsAwarded: rewardAmount,
-        newBalance: newBalance
+        coinsAwarded: 5, // Fixed reward amount for detailed candidate feedback
+        newBalance: user.coinBalance
       });
     } catch (error) {
       if (error instanceof ZodError) {
@@ -255,16 +246,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
     
     try {
-      const { notifications, privacyMode, autoDetect, googleEnabled, bingEnabled, duckDuckGoEnabled } = req.body;
+      const { notifications, privacyMode, autoDetect, linkedInEnabled, indeedEnabled, zipRecruiterEnabled } = req.body;
       
       const updateData = {
         userId: req.session.userId,
         notifications: notifications !== undefined ? notifications : true,
         privacyMode: privacyMode !== undefined ? privacyMode : true,
         autoDetect: autoDetect !== undefined ? autoDetect : true,
-        googleEnabled: googleEnabled !== undefined ? googleEnabled : true,
-        bingEnabled: bingEnabled !== undefined ? bingEnabled : true,
-        duckDuckGoEnabled: duckDuckGoEnabled !== undefined ? duckDuckGoEnabled : true,
+        linkedInEnabled: linkedInEnabled !== undefined ? linkedInEnabled : true,
+        indeedEnabled: indeedEnabled !== undefined ? indeedEnabled : true,
+        zipRecruiterEnabled: zipRecruiterEnabled !== undefined ? zipRecruiterEnabled : true,
       };
       
       const updatedSettings = await storage.createOrUpdateSettings(updateData);

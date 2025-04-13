@@ -166,8 +166,37 @@ export class MemStorage implements IStorage {
   async createFeedback(feedbackData: InsertFeedback): Promise<Feedback> {
     const id = this.feedbackId++;
     const timestamp = new Date();
-    const newFeedback: Feedback = { ...feedbackData, id, timestamp };
+    
+    // Ensure array fields have default values
+    const goodMatchElements = feedbackData.goodMatchElements || [];
+    const poorMatchElements = feedbackData.poorMatchElements || [];
+    
+    const newFeedback: Feedback = { 
+      ...feedbackData, 
+      id, 
+      timestamp, 
+      goodMatchElements, 
+      poorMatchElements 
+    };
+    
     this.feedbacks.set(id, newFeedback);
+    
+    // Reward user with coins for detailed candidate feedback
+    if (feedbackData.userId) {
+      const user = await this.getUser(feedbackData.userId);
+      if (user) {
+        // Add 5 coins for feedback submission
+        await this.updateUserCoinBalance(user.id, user.coinBalance + 5);
+        
+        // Create a transaction record
+        await this.createTransaction({
+          userId: user.id,
+          amount: 5,
+          description: "Feedback reward for candidate review"
+        });
+      }
+    }
+    
     return newFeedback;
   }
   
