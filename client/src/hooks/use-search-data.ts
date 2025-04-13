@@ -49,11 +49,14 @@ export function useSearchData() {
       const res = await apiRequest("POST", "/api/feedback", feedback);
       return res.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Force invalidate wallet data to refresh balance
       queryClient.invalidateQueries({ queryKey: ["/api/wallet"] });
+      queryClient.refetchQueries({ queryKey: ["/api/wallet"] });
+      
       toast({
         title: "Feedback submitted!",
-        description: "Thank you! Coins have been added to your wallet.",
+        description: `Thank you! +${data.coinsAwarded || 5} coins added to your wallet.`,
       });
     },
     onError: (error) => {

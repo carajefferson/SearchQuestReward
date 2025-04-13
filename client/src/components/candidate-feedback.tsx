@@ -101,7 +101,7 @@ const CandidateFeedback: React.FC<CandidateFeedbackProps> = ({
     try {
       // In a real implementation, we would use the actual candidate ID from the database
       // For now, we're using a mock ID of 1
-      await onSubmitFeedback({
+      const response = await onSubmitFeedback({
         searchId,
         candidateId: 1, // Mock ID for demonstration
         relevanceRating,
@@ -110,10 +110,15 @@ const CandidateFeedback: React.FC<CandidateFeedbackProps> = ({
         poorMatchElements,
         comment: comment.trim() || undefined,
       });
-
+      
+      // Update local storage coin balance directly
+      const currentBalance = parseInt(localStorage.getItem('wallet_balance') || '0', 10);
+      const coinsAwarded = response?.coinsAwarded || 5;
+      localStorage.setItem('wallet_balance', (currentBalance + coinsAwarded).toString());
+      
       toast({
         title: "Feedback submitted!",
-        description: "Thank you! +5 coins added to your wallet.",
+        description: `Thank you! +${coinsAwarded} coins added to your wallet.`,
         variant: "default",
       });
 
