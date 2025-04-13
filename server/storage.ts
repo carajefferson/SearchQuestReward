@@ -171,12 +171,16 @@ export class MemStorage implements IStorage {
     const goodMatchElements = feedbackData.goodMatchElements || [];
     const poorMatchElements = feedbackData.poorMatchElements || [];
     
+    // Add default values for ratings if not provided (removed from the schema)
     const newFeedback: Feedback = { 
       ...feedbackData, 
       id, 
       timestamp, 
       goodMatchElements, 
-      poorMatchElements 
+      poorMatchElements,
+      // Set default ratings if not provided (for database schema compatibility)
+      relevanceRating: (feedbackData as any).relevanceRating ?? 3,
+      qualityRating: (feedbackData as any).qualityRating ?? 3
     };
     
     this.feedbacks.set(id, newFeedback);
