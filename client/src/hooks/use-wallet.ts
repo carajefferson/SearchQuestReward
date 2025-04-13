@@ -34,6 +34,28 @@ export function useWallet() {
     }
   }, [data?.balance]);
   
+  // Listen for custom wallet update events (for development mode)
+  useEffect(() => {
+    const handleWalletUpdate = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      if (customEvent.detail && customEvent.detail.coinsAdded) {
+        const coinsToAdd = customEvent.detail.coinsAdded;
+        setLocalBalance(prev => {
+          const newBalance = prev + coinsToAdd;
+          // Update localStorage
+          localStorage.setItem('wallet_balance', newBalance.toString());
+          return newBalance;
+        });
+      }
+    };
+    
+    window.addEventListener('wallet-update', handleWalletUpdate);
+    
+    return () => {
+      window.removeEventListener('wallet-update', handleWalletUpdate);
+    };
+  }, []);
+  
   const refreshWallet = () => {
     // Immediately refetch
     refetch();

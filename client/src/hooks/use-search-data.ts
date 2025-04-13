@@ -291,14 +291,27 @@ export function useSearchData() {
     const isDev = process.env.NODE_ENV === 'development';
 
     if (isDev) {
-      // In development mode, just simulate a successful feedback submission
+      // In development mode, update the local wallet balance - a simpler approach
+      const COINS_TO_ADD = 5;
+      
+      // Dispatch an action to update the wallet directly
+      try {
+        // For development mode, this will dispatch an event that will update relevant components
+        window.dispatchEvent(new CustomEvent('wallet-update', { 
+          detail: { coinsAdded: COINS_TO_ADD } 
+        }));
+      } catch (error) {
+        console.error("Error updating wallet balance:", error);
+      }
+      
+      // Simulate a successful feedback submission
       toast({
         title: "Feedback submitted!",
-        description: "Thank you! +5 coins added to your wallet.",
+        description: `Thank you! +${COINS_TO_ADD} coins added to your wallet.`,
       });
 
       // Return a mock response
-      return { coinsAwarded: 5 };
+      return { coinsAwarded: COINS_TO_ADD };
     } else {
       // In production mode, actually submit to the server
       return await submitFeedbackMutation(feedbackWithSearchId);
