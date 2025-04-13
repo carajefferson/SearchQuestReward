@@ -138,8 +138,6 @@ export const insertSettingsSchema = createInsertSchema(settings).pick({
 export const feedbackSubmissionSchema = z.object({
   searchId: z.number(),
   candidateId: z.number(),
-  relevanceRating: z.number().min(1).max(5),
-  qualityRating: z.number().min(1).max(5),
   goodMatchElements: z.array(z.string()).optional().default([]),
   poorMatchElements: z.array(z.string()).optional().default([]),
   comment: z.string().optional(),
