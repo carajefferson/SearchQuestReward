@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="64" cy="64" r="60" fill="#5469d4" />
+  
+  <!-- Search icon -->
+  <path d="M54,36 C67.3,36 78,46.7 78,60 C78,66.3 75.8,72.1 71.9,76.6 L89,93.7 C90.6,95.3 90.6,97.9 89,99.5 C87.4,101.1 84.8,101.1 83.2,99.5 L66.1,82.4 C61.6,86.3 55.8,88.5 49.5,88.5 C36.2,88.5 25.5,77.8 25.5,64.5 C25.5,51.2 36.2,40.5 49.5,40.5 C51,40.5 52.5,40.7 54,41 L54,36 Z" fill="white" />
+  
+  <!-- Feedback icon (thumbs up) -->
+  <path d="M85,48 C89.4,48 93,51.6 93,56 L93,80 C93,84.4 89.4,88 85,88 L65,88 C63.1,88 61.3,87.3 59.9,86 L46,72.1 L46,48 L82.1,48 C83,48 84,48.4 84.8,49.2 C84.9,49.3 85,49.5 85,49.6 L85,48 Z" fill="white" />
+  
+  <!-- Coin icon -->
+  <circle cx="90" cy="90" r="20" fill="#f6e56b" stroke="#ffd700" stroke-width="3" />
+  <text x="90" y="95" font-family="Arial" font-size="20" text-anchor="middle" fill="#5469d4">$</text>
+</svg>
