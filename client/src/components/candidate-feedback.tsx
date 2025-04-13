@@ -56,29 +56,7 @@ const CandidateFeedback: React.FC<CandidateFeedbackProps> = ({
     );
   };
   
-  // Generate a summary of highlighted elements
-  const getHighlightSummary = () => {
-    const goodCount = profileElements.filter(el => el.highlighted && el.highlightType === "good").length;
-    const poorCount = profileElements.filter(el => el.highlighted && el.highlightType === "poor").length;
-    
-    return (
-      <div className="mt-3 p-3 bg-neutral-50 border border-neutral-200 rounded-md">
-        <div className="flex flex-wrap gap-2">
-          <div className="flex items-center">
-            <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1"></span>
-            <span className="text-sm">{goodCount} good match{goodCount !== 1 ? 'es' : ''}</span>
-          </div>
-          <div className="flex items-center ml-4">
-            <span className="inline-block w-3 h-3 rounded-full bg-red-500 mr-1"></span>
-            <span className="text-sm">{poorCount} poor match{poorCount !== 1 ? 'es' : ''}</span>
-          </div>
-          {goodCount === 0 && poorCount === 0 && (
-            <span className="text-sm text-neutral-500 italic">No elements highlighted yet</span>
-          )}
-        </div>
-      </div>
-    );
-  };
+
 
   const handleSubmit = async () => {
     if (!candidate) {
@@ -214,10 +192,7 @@ const CandidateFeedback: React.FC<CandidateFeedbackProps> = ({
               Select which elements of the candidate's profile are good or poor matches for your search criteria.
             </p>
             
-            {/* Highlight Summary */}
-            {getHighlightSummary()}
-            
-            <div className="space-y-3 mt-4">
+            <div className="space-y-3">
               {profileElements.map(element => (
                 <div 
                   key={element.id} 
