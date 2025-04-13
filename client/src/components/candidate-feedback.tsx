@@ -63,7 +63,6 @@ const CandidateFeedback: React.FC<CandidateFeedbackProps> = ({
     
     return (
       <div className="mt-3 p-3 bg-neutral-50 border border-neutral-200 rounded-md">
-        <h4 className="font-medium text-sm mb-2">Current Feedback Summary</h4>
         <div className="flex flex-wrap gap-2">
           <div className="flex items-center">
             <span className="inline-block w-3 h-3 rounded-full bg-green-500 mr-1"></span>
