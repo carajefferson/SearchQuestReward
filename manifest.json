@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "SearchCash",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Provide feedback on search results and earn coins in your wallet",
   "permissions": ["activeTab", "storage", "tabs"],
   "host_permissions": [
@@ -29,12 +29,10 @@
     {
       "matches": [
         "*://*.linkedin.com/search/results*",
-        "*://*.linkedin.com/talent/search*",
+        "*//*.linkedin.com/talent/search*",
         "*://resumes.indeed.com/*",
-        "*://*.indeed.com/jobs*",
-        "*://*.indeed.com/resumes*",
-        "*://*.employers.indeed.com/*",
-        "*://*.ziprecruiter.com/candidate/search*"
+        "*://*.ziprecruiter.com/candidate/search*",
+        "*//://*.employers.indeed.com/*"
       ],
       "js": ["content-script.js"]
     }
