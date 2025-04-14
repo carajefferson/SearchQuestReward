@@ -9,14 +9,58 @@ document.addEventListener('DOMContentLoaded', function() {
   };
   let currentSearch = null;
   let searchResults = [];
-  let transactions = [{
-    id: 1,
-    userId: 1,
-    amount: 50,
-    description: 'Welcome Bonus',
-    timestamp: new Date()
-  }];
-  let balance = 50;
+  
+  // Initialize wallet from Chrome storage or use defaults
+  let transactions = [];
+  let balance = 0;
+  
+  // Try to load wallet data from Chrome storage
+  try {
+    chrome.storage.sync.get(['walletBalance', 'walletTransactions'], function(result) {
+      if (result.walletBalance) {
+        balance = parseInt(result.walletBalance, 10);
+        console.log('Loaded wallet balance from storage:', balance);
+      } else {
+        // Default initial balance
+        balance = 50;
+        // Save to storage
+        chrome.storage.sync.set({walletBalance: balance});
+        console.log('Set default wallet balance:', balance);
+      }
+      
+      if (result.walletTransactions && Array.isArray(result.walletTransactions)) {
+        transactions = result.walletTransactions;
+        console.log('Loaded transactions from storage:', transactions.length);
+      } else {
+        // Initialize with welcome bonus
+        transactions = [{
+          id: 1,
+          userId: 1,
+          amount: 50,
+          description: 'Welcome Bonus',
+          timestamp: new Date()
+        }];
+        // Save to storage
+        chrome.storage.sync.set({walletTransactions: transactions});
+        console.log('Set default wallet transactions');
+      }
+      
+      // Update wallet display with the loaded data
+      updateWalletDisplay();
+    });
+  } catch (error) {
+    console.log('Error accessing Chrome storage, using defaults:', error);
+    // Default initial balance
+    balance = 50;
+    // Initialize with welcome bonus
+    transactions = [{
+      id: 1,
+      userId: 1,
+      amount: 50,
+      description: 'Welcome Bonus',
+      timestamp: new Date()
+    }];
+  }
   
   // Function to format dates
   function formatDate(date) {
