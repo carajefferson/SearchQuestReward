@@ -553,6 +553,18 @@ document.addEventListener('DOMContentLoaded', function() {
       // Update balance
       balance += rewardCoins;
       
+      // Persist changes to storage
+      try {
+        chrome.storage.sync.set({
+          walletBalance: balance,
+          walletTransactions: transactions
+        }, function() {
+          console.log('Wallet updated in storage. New balance:', balance);
+        });
+      } catch (error) {
+        console.error('Error saving wallet to storage:', error);
+      }
+      
       // Show success message
       resultsContainer.innerHTML = `
         <div class="card">
