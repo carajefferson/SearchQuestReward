@@ -29,10 +29,12 @@
     {
       "matches": [
         "*://*.linkedin.com/search/results*",
-        "*//*.linkedin.com/talent/search*",
+        "*://*.linkedin.com/talent/search*",
         "*://resumes.indeed.com/*",
-        "*://*.ziprecruiter.com/candidate/search*",
-        "*//://*.employers.indeed.com/*"
+        "*://*.indeed.com/jobs*",
+        "*://*.indeed.com/resumes*",
+        "*://*.employers.indeed.com/*",
+        "*://*.ziprecruiter.com/candidate/search*"
       ],
       "js": ["content-script.js"]
     }
